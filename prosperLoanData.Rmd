@@ -83,7 +83,11 @@ testsample$ListingCreationDate<- as.POSIXct(testsample$ListingCreationDate,forma
 RawData$ListingCreationDate<- as.POSIXct(RawData$ListingCreationDate,format="%Y-%m-%d %H:%M:%S")
 
 ggplot(data=RawData,aes(x=ListingCreationDate))+
-  geom_histogram(bins=70)
+  geom_histogram(bins=70)+
+  theme(axis.text.x = element_text(face="bold", color="#993333", 
+                           size=14, angle=45),
+          axis.text.y = element_text(face="bold", color="#993333", 
+                           size=14, angle=45))
 ```
 
 ```{r}
@@ -91,19 +95,26 @@ Occupation_group<- group_by(RawData,Occupation)
 
 RawData.Occupation_group<-summarise(Occupation_group,count=n())
 
-RawData.Occupation_group<-arrange(RawData.Occupation_group,count)
+RawData.Occupation_group<-arrange(RawData.Occupation_group,-(count))
 
-ggplot(data = tail(RawData,15),aes(x=Occupation  , y=stat_count(Occupation)))+
-  geom_bar()
-  
 
+ggplot(data = head(RawData.Occupation_group,10),aes(x= reorder(Occupation, -count)   , y=count))+
+  geom_bar(stat = "identity")+
+  theme(axis.text.x = element_text(size=10, angle=45,hjust = 1))
+
+```
+
+```{r}
 ```
 
 
 ```{r}
 
-ggplot(data=RawData,aes(x=Occupation))+
-  geom_bar(bins=70)
+##aes(x=reorder(Position, -table(Position)[Position]))
+
+ggplot(data=RawData,aes(x=reorder(Occupation, -table(Occupation)[Occupation])))+
+  geom_bar()+
+  
 
 ```
 
