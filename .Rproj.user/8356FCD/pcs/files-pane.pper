@@ -1,0 +1,9 @@
+{
+    "path" : "~/Rstudio/ProsperLoanData",
+    "sortOrder" : [
+        {
+            "ascending" : true,
+            "columnIndex" : 2
+        }
+    ]
+}
