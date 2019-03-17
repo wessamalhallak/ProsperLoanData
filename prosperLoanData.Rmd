@@ -41,6 +41,8 @@ library(gridExtra)
 library(dplyr)
 library(reshape2)
 library(alr3)
+library(forcats)
+library(viridis)
 ```
 
 ```{r echo=FALSE, Load_the_Data}
@@ -84,10 +86,8 @@ RawData$ListingCreationDate<- as.POSIXct(RawData$ListingCreationDate,format="%Y-
 
 ggplot(data=RawData,aes(x=ListingCreationDate))+
   geom_histogram(bins=70)+
-  theme(axis.text.x = element_text(face="bold", color="#993333", 
-                           size=14, angle=45),
-          axis.text.y = element_text(face="bold", color="#993333", 
-                           size=14, angle=45))
+  theme(axis.text.x = element_text(size=10),
+          axis.text.y = element_text(size=10, angle=45))
 ```
 
 ```{r}
@@ -114,9 +114,68 @@ ggplot(data = head(RawData.Occupation_group,10),aes(x= reorder(Occupation, -coun
 
 ggplot(data=RawData,aes(x=reorder(Occupation, -table(Occupation)[Occupation])))+
   geom_bar()+
+  #ylim(500,100000)+
+  theme(axis.text.x = element_text(size=8, angle=90,hjust = 1))
   
 
 ```
+
+
+```{r}
+RawData %>% count(Occupation) %>% filter(n > quantile(n,0.9)) %>%
+ggplot(aes(x = reorder(Occupation,-n), y = n)) +
+geom_bar(stat = "identity") + theme_minimal() +
+theme(axis.text.x = element_text(size = 10, angle= 45, hjust=1))
+```
+
+```{r}
+RawData %>% count(Occupation) %>% 
+  mutate(Occupation=reorder(Occupation,-n))%>% 
+  filter(n>quantile(n,0.80))%>%
+  ggplot(aes(Occupation, y = n,fill=n))+
+    geom_bar(stat = "identity")+
+    theme_minimal()+
+    theme(axis.text.x = element_text(size = 10, angle= 45, hjust=1))
+```
+
+```{r}
+
+RawData %>%
+  filter(Occupation!="Other" )%>%
+  filter(Occupation!="Professional" )%>%
+  filter(Occupation!="")%>%
+  count(Occupation) %>% 
+  mutate(Occupation=reorder(Occupation,-n))%>% 
+  filter(n>quantile(n,0.70))%>%
+  ggplot(aes(x=Occupation, y = n,fill=sqrt(n)))+
+    geom_bar(stat = "identity")+
+    #scale_fill_viridis(option = "D")+
+    theme_minimal()+
+    theme(axis.text.x = element_text(size = 10, angle= 60, hjust=1))
+```
+
+```{r}
+
+RawData %>%
+  #mutate(as.factor(Term))%>%
+  #count(Term) %>% 
+  ggplot(aes(x=as.factor(Term),
+             #fill=count(Term)
+             ))+
+    geom_bar()+
+    coord_trans(y='sqrt')+
+    theme_minimal()+
+    theme(axis.text.x = element_text(size = 24))
+
+  
+```
+
+```{r}
+plot
+```
+
+
+
 
 
 
