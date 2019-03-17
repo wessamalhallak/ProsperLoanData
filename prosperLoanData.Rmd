@@ -76,7 +76,7 @@ Investors
 RawData$ListingCreationDate<- as.POSIXct(RawData$ListingCreationDate,format="%Y-%m-%d %H:%M:%S")
 
 ggplot(data=RawData,aes(x=ListingCreationDate))+
-  geom_histogram(bins=70)+
+  geom_histogram(bins=200)+
   theme(axis.text.x = element_text(size=10),
           axis.text.y = element_text(size=10, angle=45))
 ```
@@ -211,7 +211,7 @@ RawData%>%
   filter(BorrowerRate<quantile(BorrowerRate,0.99))%>%
   #count(BorrowerRate)%>%
   ggplot(aes(x=BorrowerRate))+
-    geom_histogram(bins=50,fill="#563ec3")+
+    geom_histogram(bins=40,fill="#563ec3")+
     theme_minimal()+
     theme(axis.text.x = element_text(size = , angle= 45, hjust=1))+
     labs(title="The Borrower's interest rate for this loan.  ", x="Borrower Rate", y="Count")
@@ -246,7 +246,7 @@ RawData%>%
   filter(MonthlyLoanPayment>quantile(MonthlyLoanPayment,0.01))%>%
   filter(MonthlyLoanPayment<quantile(MonthlyLoanPayment,0.99))%>%
   ggplot(aes(x=MonthlyLoanPayment))+
-    geom_histogram(bins=30,fill="#563ec3")+
+    geom_histogram(bins=100,fill="#563ec3")+
     theme_minimal()+
     theme(axis.text.x = element_text(size = , angle= 45, hjust=1))+
     labs(title="The scheduled monthly loan payment.", x="Monthly Loan Payment", y="Count")
@@ -311,28 +311,63 @@ RawData%>%
     geom_histogram(bins=100,fill="#356e9c")+
     theme_minimal()+
     theme(axis.text.x = element_text(size = , angle= 45, hjust=1))+
-    labs(title="The number of investors that funded the loan.", x="Investors", y="Count")
+    labs(title="Investors",
+         subtitle="The number of investors that funded the loan.",
+         x="Investors",
+         y="Count")
 
 ```
+
+
+Employment Status Duration
+The length in months of the employment status at the time the listing was created.
 
 
 
 
 ```{r}
 
-#myVar<- c("LoanStaus", "BorrowerRate",
-#          "ProsperRating","BorrowerState",'Occupation','EmploymentStatusDuration',
-#          'AvailableBankcardCredit','StatedMonthlyIncome','LoanOriginalAmount','MonthlyLoanPayment',
-#          'LP_InterestandFees')
+EmploymentStatusDuration=RawData$EmploymentStatusDuration
+RawData%>%
+  filter(is.finite(EmploymentStatusDuration))%>%
+  filter(EmploymentStatusDuration>quantile(EmploymentStatusDuration,0.04))%>%
+  filter(EmploymentStatusDuration<quantile(EmploymentStatusDuration,0.96))%>%
+  ggplot(aes(EmploymentStatusDuration))+
+  geom_histogram(bins=156,fill="#c54e74")+
+  labs(title="Employment Status Duration",
+         subtitle="The length in months of the employment status at the time the listing was created.",
+         x="Employment Status Duration",
+         y="Count")
+  
+```
 
-#toExplore<-loanData["LoanStaus", "BorrowerRate",
-#          "ProsperRating","BorrowerState",'Occupation','EmploymentStatusDuration',
-#          'AvailableBankcardCredit','StatedMonthlyIncome','LoanOriginalAmount','MonthlyLoanPayment',
-#          'LP_InterestandFees']
+
+```{r}
 
 
 
 
+theme_set(theme_classic())
+
+# Histogram on a Continuous (Numeric) Variable
+g <- ggplot(mpg, aes(displ)) + scale_fill_brewer(palette = "Spectral")
+
+g + geom_histogram(aes(fill=class), 
+                   binwidth = .1, 
+                   col="black", 
+                   size=.1) +  # change binwidth
+  labs(title="Histogram with Auto Binning", 
+       subtitle="Engine Displacement across Vehicle Classes") 
+```
+
+```{r}
+
+g + geom_histogram(aes(fill=class), 
+                   bins=5, 
+                   col="black", 
+                   size=.1) +   # change number of bins
+  labs(title="Histogram with Fixed Bins", 
+       subtitle="Engine Displacement across Vehicle Classes") 
 ```
 
 
@@ -346,9 +381,50 @@ forget to add a comment after each plot or closely-related group of plots!
 There should be multiple code chunks and text sections; the first one below is
 just to help you get started.
 
+
+Year and Investor per loan
 ```{r echo=FALSE, Univariate_Plots}
 
+RawData%>%
+  ggplot(aes(x=ListingCreationDate,fill=LoanStatus))+
+  geom_histogram(bins=100)+
+  coord_trans(y="sqrt")+
+  labs(title="Running Loan ",
+       subtitle="that funded the loan.",
+       x="Listing Creation Date",
+       y="Count",
+       fill="Loan Status")
 
+```
+ 
+
+
+```{r}
+RawData%>%
+  ggplot(aes(x=ListingCreationDate,fill=IncomeRange))+
+  geom_histogram(bins=400)+
+  coord_trans(y="sqrt")+
+  labs(title="Running Loan ",
+       subtitle="that funded the loan.",
+       x="Listing Creation Date",
+       y="Count",
+       fill="Loan Status")
+
+```
+
+
+
+
+```{r}
+RawData%>%
+  ggplot(aes(x=ListingCreationDate,colours=LP_InterestandFees))+
+  geom_histogram(bins=100)+
+  coord_trans(y="sqrt")+
+  labs(title="Running Loan ",
+       subtitle="that funded the loan.",
+       x="Listing Creation Date",
+       y="Count",
+       fill="Loan Status")
 
 ```
 
