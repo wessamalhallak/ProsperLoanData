@@ -59,6 +59,7 @@ And I will list my interested Variables  after reading the descriptions of each 
 ListingCreationDate
 Term
 LoanStatus
+IncomeRange
 BorrowerRate
 ProsperRating (numeric)
 Occupation
@@ -70,16 +71,6 @@ MonthlyLoanPayment
 LP_InterestandFees
 Investors
 
-2010-10-20 11:30:45.950000000
-
-
-
-
-```{r}
-testsample<- sample_n(tbl = RawData,20)
-testsample$ListingCreationDate<- as.POSIXct(testsample$ListingCreationDate,format="%Y-%m-%d %H:%M:%S")
-
-```
 
 ```{r}
 RawData$ListingCreationDate<- as.POSIXct(RawData$ListingCreationDate,format="%Y-%m-%d %H:%M:%S")
@@ -114,28 +105,34 @@ ggplot(data = head(RawData.Occupation_group,10),aes(x= reorder(Occupation, -coun
 
 ggplot(data=RawData,aes(x=reorder(Occupation, -table(Occupation)[Occupation])))+
   geom_bar()+
+  coord_trans(y="sqrt")+
   #ylim(500,100000)+
-  theme(axis.text.x = element_text(size=8, angle=90,hjust = 1))
+  theme(axis.text.x = element_text(size=6, angle=90,hjust = 1))+
+  labs(title="Occupation ", x="Occupation", y="Count")
   
 
 ```
 
 
 ```{r}
-RawData %>% count(Occupation) %>% filter(n > quantile(n,0.9)) %>%
-ggplot(aes(x = reorder(Occupation,-n), y = n)) +
-geom_bar(stat = "identity") + theme_minimal() +
-theme(axis.text.x = element_text(size = 10, angle= 45, hjust=1))
+RawData %>%
+  count(Occupation) %>%
+  filter(n > quantile(n,0.85)) %>%
+  ggplot(aes(x = reorder(Occupation,-n), y = n)) +
+    geom_bar(stat = "identity") + theme_minimal() +
+    theme(axis.text.x = element_text(size = 10, angle= 45, hjust=1))+
+    labs(title="Occupation ", x="Occupation", y="Count")
 ```
 
 ```{r}
 RawData %>% count(Occupation) %>% 
   mutate(Occupation=reorder(Occupation,-n))%>% 
   filter(n>quantile(n,0.80))%>%
-  ggplot(aes(Occupation, y = n,fill=n))+
+  ggplot(aes(Occupation, y = n,fill=sqrt(n)))+
     geom_bar(stat = "identity")+
     theme_minimal()+
-    theme(axis.text.x = element_text(size = 10, angle= 45, hjust=1))
+    theme(axis.text.x = element_text(size = 10, angle= 45, hjust=1))+
+  labs(title="Occupation ", x="Occupation", y="Count",fill="Sqrt(Count)")
 ```
 
 ```{r}
@@ -151,7 +148,8 @@ RawData %>%
     geom_bar(stat = "identity")+
     #scale_fill_viridis(option = "D")+
     theme_minimal()+
-    theme(axis.text.x = element_text(size = 10, angle= 60, hjust=1))
+    theme(axis.text.x = element_text(size = 8, angle= 60, hjust=1))+
+    labs(title="Occupation ", x="Occupation", y="Count",fill="Sqrt(Count)")
 ```
 
 ```{r}
@@ -159,24 +157,86 @@ RawData %>%
 RawData %>%
   #mutate(as.factor(Term))%>%
   #count(Term) %>% 
-  ggplot(aes(x=as.factor(Term),
-             #fill=count(Term)
-             ))+
+  ggplot(aes(x=as.factor(Term)))+
     geom_bar()+
     coord_trans(y='sqrt')+
     theme_minimal()+
-    theme(axis.text.x = element_text(size = 24))
-
+    theme(axis.text.x = element_text(size = 24))+
+    labs(title="Term", x="Term", y="Count")
   
 ```
 
 ```{r}
-plot
+loanstat=RawData$LoanStatus
+RawData %>%
+  count(LoanStatus) %>% 
+  mutate(LoanStatus=reorder(LoanStatus,-n))%>% 
+  #filter(n>quantile(n,0.20))%>%
+  ggplot(aes(x=LoanStatus, y = sqrt(n),fill=sqrt(n)))+
+    geom_bar(stat = "identity")+
+    #coord_trans(x='sqrt')+
+    #coord_polar()+
+    scale_fill_viridis(option = "A")+
+    theme_minimal()+
+    theme(axis.text.x = element_text(size =8, angle= 45, hjust=1))+
+    labs(title="Loan Status Count ", x="Loan Status", y="Count",fill="Sqrt(Count)")
+```
+
+```{r}
+IncomeRange=RawData$IncomeRange
+RawData %>%
+  count(IncomeRange) %>% 
+  #mutate(IncomeRange=reorder(IncomeRange,-n))%>% 
+  #filter(n>quantile(n,0.20))%>%
+  ggplot(aes(x=IncomeRange, y = n,fill=sqrt(n)))+
+    geom_bar(stat = "identity")+
+    #coord_trans(x='log')+
+    #coord_polar()+
+    #scale_fill_viridis(option = "A")+
+    theme_minimal()+
+    theme(axis.text.x = element_text(size = , angle= 45, hjust=1))+
+    labs(title="Income Range", x="Inocme Range", y="Count",fill="Sqrt(Count)")
 ```
 
 
+LoanStatus
+```{r}
+BorrowerRate=RawData$BorrowerRate
+RawData%>%
+  filter(BorrowerRate>quantile(BorrowerRate,0.01))%>%
+  filter(BorrowerRate<quantile(BorrowerRate,0.99))%>%
+  #count(BorrowerRate)%>%
+  ggplot(aes(x=BorrowerRate))+
+    geom_histogram(bins=50)+
+    theme_minimal()+
+    theme(axis.text.x = element_text(size = , angle= 45, hjust=1))+
+    labs(title="Histogram for Borrower Rate ", x="Borrower Rate", y="Count")
+
+```
 
 
+ProsperRating 
+```{r}
+levels(RawData$ProsperRating..Alpha.)
+RawData %>%
+  filter(RawData$ProsperRating..Alpha.!="")%>%
+  count(ProsperRating..Alpha.) %>% 
+  #mutate(IncomeRange=reorder(IncomeRange,-n))%>% 
+  #filter(n>quantile(n,0.20))%>%
+  ggplot(aes(x=ProsperRating..Alpha., y = n,fill=sqrt(n)))+
+    geom_bar(stat = "identity")+
+    theme_minimal()+
+    theme(axis.text.x = element_text( ))+
+    labs(title="Prosper Rating", x="Prosper Rating", y="Count",fill="Sqrt(Count)")
+```
+
+Monthly Loan Payment
+
+```{r}
+
+MonthlyLoanPayment=RawData$MonthlyLoanPayment
+
+```
 
 
 ```{r}
