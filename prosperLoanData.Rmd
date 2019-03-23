@@ -35,6 +35,7 @@ a margin line to help you keep track of this guideline!
 # want it to. This will clean up the flow of your report.
 
 library(ggplot2)
+library(ggridges)
 library(plyr)
 library(GGally)
 library(gridExtra)
@@ -48,9 +49,7 @@ library(viridis)
 ```{r echo=FALSE, Load_the_Data}
 # Load the Data
 RawData<-read.csv("prosperLoanData.csv")
-head(RawData)
 Variable<-read.delim(file="prosperLoanData_variables.tsv")
-head(Variable)
 ```
 
 This data set contains 113,937 loans with 81 variables on each loan,including loan amount,borrower rate (orinterest rate), currentloan status, borrowerincome, borroweremployment status,borrower credit history,and the latest paymentinformation.
@@ -108,7 +107,10 @@ ggplot(data=RawData,aes(x=reorder(Occupation, -table(Occupation)[Occupation])))+
   coord_trans(y="sqrt")+
   #ylim(500,100000)+
   theme(axis.text.x = element_text(size=6, angle=90,hjust = 1))+
-  labs(title="Occupation ", x="Occupation", y="Count")
+  labs(title="Occupation ",
+       subtitle="",
+       x="Occupation",
+       y="Count")
   
 
 ```
@@ -218,6 +220,19 @@ RawData%>%
 
 ```
 
+LoanOriginalAmount
+```{r}
+RawData%>%
+  filter(LoanOriginalAmount!=0)%>%
+  ggplot(aes(x = LoanOriginalAmount,fill=..x..))+
+  geom_density()
+  
+
+```
+```{r}
+
+```
+
 
 Prosper Rating :
 The Prosper Rating assigned at the time the listing was created between AA - HR.  Applicable for loans originated after July 2009.
@@ -255,6 +270,9 @@ RawData%>%
 ```
 
 
+
+
+
 ```{r}
 RawData%>%
   filter(MonthlyLoanPayment>125)%>%
@@ -264,6 +282,21 @@ RawData%>%
     theme_minimal()+
     theme(axis.text.x = element_text(size = , angle= 45, hjust=1))+
     labs(title="The scheduled monthly loan payment", x="Monthly Loan Payment", y="Count")
+
+```
+
+
+CreditGrade
+```{r}
+RawData%>%
+  filter(CreditGrade!="")%>%
+  count(CreditGrade) %>% 
+  ggplot(aes(x=CreditGrade, y = n,fill=sqrt(n)))+
+    geom_bar(stat = "identity")+
+    theme_minimal()+
+    theme(axis.text.x = element_text( ))+
+    labs(title="CreditGrade", x="CreditGrade", y="Count",fill="Sqrt(Count)")
+
 ```
 
 LP InterestandFees
@@ -304,12 +337,13 @@ The number of investors that funded the loan.
 Investors=RawData$Investors
 
 RawData%>%
-  filter(Investors>quantile(Investors,0.03))%>%
+  #filter(Investors>quantile(Investors,0.03))%>%
   #filter(Investors<600)%>%
   filter(Investors<quantile(Investors,0.97))%>%
   ggplot(aes(x=Investors))+
     geom_histogram(bins=100,fill="#356e9c")+
     theme_minimal()+
+    coord_trans(y="sqrt")+
     theme(axis.text.x = element_text(size = , angle= 45, hjust=1))+
     labs(title="Investors",
          subtitle="The number of investors that funded the loan.",
@@ -342,9 +376,6 @@ RawData%>%
 ```
 
 
-```{r}
-
-
 
 
 theme_set(theme_classic())
@@ -358,9 +389,6 @@ g + geom_histogram(aes(fill=class),
                    size=.1) +  # change binwidth
   labs(title="Histogram with Auto Binning", 
        subtitle="Engine Displacement across Vehicle Classes") 
-```
-
-```{r}
 
 g + geom_histogram(aes(fill=class), 
                    bins=5, 
@@ -368,7 +396,6 @@ g + geom_histogram(aes(fill=class),
                    size=.1) +   # change number of bins
   labs(title="Histogram with Fixed Bins", 
        subtitle="Engine Displacement across Vehicle Classes") 
-```
 
 
 
@@ -399,16 +426,21 @@ RawData%>%
  
 
 
+
 ```{r}
+
+
 RawData%>%
-  ggplot(aes(x=ListingCreationDate,fill=IncomeRange))+
-  geom_histogram(bins=400)+
+  filter(!IncomeRange %in% list("Not displayed","$0") )%>%
+  ggplot(aes(x=ListingCreationDate,fill=reorder(IncomeRange,-table(IncomeRange)[IncomeRange])))+
+  geom_histogram(bins=300)+
   coord_trans(y="sqrt")+
-  labs(title="Running Loan ",
-       subtitle="that funded the loan.",
+  scale_fill_brewer(palette = 1,direction = -1)+
+  labs(title="Income Range in time ",
+       subtitle="he income range of the borrower at the time the listing was created.",
        x="Listing Creation Date",
        y="Count",
-       fill="Loan Status")
+       fill="IncomeRange")
 
 ```
 
@@ -416,15 +448,176 @@ RawData%>%
 
 
 ```{r}
+
 RawData%>%
-  ggplot(aes(x=ListingCreationDate,colours=LP_InterestandFees))+
-  geom_histogram(bins=100)+
+  filter(!CreditGrade=="")%>%
+  ggplot(aes(x=ListingCreationDate,fill=CreditGrade))+
+  geom_histogram(bins=300)+
   coord_trans(y="sqrt")+
-  labs(title="Running Loan ",
-       subtitle="that funded the loan.",
+  scale_fill_brewer(palette = 3,type = "div",direction = -1)+
+  labs(title="CreditGrade ",
+       subtitle="The Credit rating that was assigned at the time the listing went live. Applicable for listings pre-2009",
        x="Listing Creation Date",
        y="Count",
-       fill="Loan Status")
+       fill="CreditGrade")
+
+```
+```{r}
+RawData%>%
+  filter(!CreditGrade=="")%>%
+  ggplot(aes(x=ListingCreationDate,fill=CreditGrade))+
+  geom_density(alpha=0.4)+
+  scale_fill_brewer(palette ="Set3" ,type = "seq",direction = -1)+
+  labs(title="CreditGrade ",
+       subtitle="The Credit rating that was assigned at the time the listing went live. Applicable for listings pre-2009",
+       x="Listing Creation Date",
+       y="Count",
+       fill="CreditGrade")
+```
+
+Monthly Loan Payment  vs time
+```{r}
+RawData %>%
+  filter(MonthlyLoanPayment>quantile(MonthlyLoanPayment,0.02))%>%
+  filter(MonthlyLoanPayment<quantile(MonthlyLoanPayment,0.98))%>%
+  ggplot(aes(x=ListingCreationDate,y=MonthlyLoanPayment))+
+  geom_jitter(alpha=0.01,color="red")+
+  geom_smooth(method="auto",level=0.5,span=0.3,n=100)
+
+```
+
+
+```{r}
+topOcc=levels(reorder(RawData$Occupation, -table(RawData$Occupation)[RawData$Occupation]))[0:15]
+RawData%>%
+  filter(Occupation %in% topOcc)%>%
+  ggplot(aes(x=reorder(Occupation, -table(Occupation)[Occupation]),fill=LoanStatus))+
+  geom_bar()+
+  coord_trans(y="sqrt")+
+  theme(axis.text.x = element_text(size=6, angle=90,hjust = 1))+
+  #scale_fill_brewer(palette = "Spectral")+
+  labs(title="Occupation ", x="Occupation", y="Count",fill=" Loan Status")
+```
+
+levels(RawData$LoanStatus)<-c(
+                              "Completed",
+                              "Cancelled",
+                              "Chargedoff",
+                              "Current",
+                              "Defaulted",
+                              "FinalPaymentInProgress",
+                              "Past Due (1-15 days)",
+                              "Past Due (16-30 days)",
+                              "Past Due (31-60 days)",
+                              "Past Due (61-90 days)",
+                              "Past Due (91-120 days)",
+                              "Past Due (>120 days)"
+                              )
+
+levels(RawData$LoanStatus)
+
+
+```{r}
+topOcc=levels(reorder(RawData$Occupation,+-table(RawData$Occupation)[RawData$Occupation]))[0:19]
+RawData %>%
+  filter(LoanStatus!="Defaulted")%>%
+  filter(Occupation %in% topOcc)%>%
+  #filter(!Occupation=="")%>%
+  #filter(!LoanStatus=="")%>%
+  count(Occupation,LoanStatus)%>%
+  ggplot(aes(x=reorder(Occupation, -table(Occupation)[Occupation]),fill=LoanStatus,y=n))+
+    geom_bar(stat = "identity")+
+    coord_trans(y="sqrt")+
+    theme(axis.text.x = element_text(size=6, angle=90,hjust = 1))+
+    scale_fill_brewer(palette = "RdYlBu")+
+    labs(title="Occupation ", x="Occupation", y="Count",fill=" Loan Status")
+```
+
+
+topOcc=levels(reorder(RawData$Occupation,+-table(RawData$Occupation)[RawData$Occupation]))[0:19]
+RawData %>%
+  filter(LoanStatus!="Defaulted")%>%
+  filter(Occupation %in% topOcc)%>%
+  #filter(!Occupation=="")%>%
+  #filter(!LoanStatus=="")%>%
+  count(Occupation,LoanStatus)%>%
+  ggplot(aes(x=reorder(Occupation, -table(Occupation)[Occupation]),fill=LoanStatus,y=n))+
+    geom_bar(stat = "identity")+
+    coord_trans(y="sqrt")+
+    theme(axis.text.x = element_text(size=6, angle=90,hjust = 1))+
+    scale_fill_brewer(palette = "RdYlBu")+
+    labs(title="Occupation ", x="Occupation", y="Count",fill=" Loan Status")
+    
+Term vs Time, 
+Term vs Investors
+```{r}
+
+RawData%>%
+  ggplot(aes(x=ListingCreationDate,fill=as.factor(Term)))+
+  geom_density(alpha=0.6)+
+  scale_fill_brewer(palette = "Set2",direction = 1)+
+  labs(title="Term ",
+       subtitle="The length of the loan expressed in months.",
+       x="Listing Creation Date",
+       y="Density",
+       fill="CreditGrade")
+
+
+```
+
+
+Term vs Investors
+```{r}
+
+RawData%>%
+  #filter(Investors>quantile(Investors,0.03))%>%
+  #filter(Investors<600)%>%
+  filter(Investors<quantile(Investors,0.97))%>%
+  ggplot(aes(x=Investors,y=as.factor(Term),fill=Term))+
+    geom_density_ridges2()+
+    theme_minimal()+
+    coord_trans(y="sqrt")+
+    scale_fill_viridis(option = "D")+
+    theme(axis.text.x = element_text(size = , angle= 45, hjust=1))+
+    labs(title="Investors",
+         subtitle="The number of investors that funded the loan.",
+         x="Investors",
+         y="Count")
+
+
+
+```
+
+```{r}
+RawData%>%
+  ggplot(aes(x=LoanOriginalAmount, y=as.factor(Term), fill=0.5 - abs(0.5-..ecdf..))) +
+    stat_density_ridges(geom = "density_ridges_gradient", calc_ecdf = TRUE) +
+    scale_fill_viridis(name = "Tail probability", direction = -1)
+```
+
+
+```{r}
+
+
+#levels(RawData$Occupation)
+levels(reorder(RawData$Occupation, -table(RawData$Occupation)[RawData$Occupation]))[0:10]
+#levels(t)
+```
+
+```{r}
+BIT=table(RawData$Occupation)[RawData$Occupation]
+```
+
+
+```{r}
+RawData%>%
+  ggplot(aes(x=reorder(Occupation, -table(Occupation)[Occupation])))+
+  geom_bar()+
+  coord_trans(y="sqrt")+
+  #ylim(500,100000)+
+  theme(axis.text.x = element_text(size=6, angle=90,hjust = 1))+
+  labs(title="Occupation ", x="Occupation", y="Count")
+```
 
 ```
 
