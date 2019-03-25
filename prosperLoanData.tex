@@ -1,0 +1,952 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={Exploring Loan Data},
+            pdfauthor={Wessam Alhallak},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\newcommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{Exploring Loan Data}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{Wessam Alhallak}
+    \preauthor{\centering\large\emph}
+  \postauthor{\par}
+      \predate{\centering\large\emph}
+  \postdate{\par}
+    \date{11 März 2019}
+
+
+\begin{document}
+\maketitle
+
+\hypertarget{exploring-loan-data-by-wessam-alhallak}{%
+\section{Exploring Loan Data by Wessam
+Alhallak}\label{exploring-loan-data-by-wessam-alhallak}}
+
+This data set contains 113,937 loans with 81 variables on each
+loan,including loan amount,borrower rate (orinterest rate), currentloan
+status, borrowerincome, borroweremployment status,borrower credit
+history,and the latest paymentinformation. And I will list my interested
+Variables after reading the descriptions of each varaibles
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{intData=RawData}\OperatorTok{%>%}\KeywordTok{select}\NormalTok{(ListingCreationDate,}
+\NormalTok{                         Term,}
+\NormalTok{                         LoanStatus,}
+\NormalTok{                         IncomeRange,}
+\NormalTok{                         BorrowerRate,}
+\NormalTok{                         ProsperRating..Alpha.,}
+\NormalTok{                         Occupation,}
+\NormalTok{                         EmploymentStatus,}
+\NormalTok{                         EmploymentStatusDuration,}
+\NormalTok{                         DebtToIncomeRatio,}
+\NormalTok{                         IncomeRange,}
+\NormalTok{                         LoanOriginalAmount,}
+\NormalTok{                         LP_InterestandFees,}
+\NormalTok{                         Investors)}
+\end{Highlighting}
+\end{Shaded}
+
+\#Scatter matrix and first overview Here we will make an overview for
+all variable together then we will try to explore variables as
+univariable to know some information about the chartatsitic for each
+variable , later on we will try to explore some information about the
+realtion between each two variables and then we try to get in depth
+between more than two variables in mulitvariable section finally I will
+reflect my conclusinios in the last section \#conclusion
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{ggpairs}\NormalTok{(intData[}\KeywordTok{sample.int}\NormalTok{(}\KeywordTok{nrow}\NormalTok{(intData),}\DecValTok{1000}\NormalTok{),],}\DataTypeTok{cardinality_threshold=}\DecValTok{100}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prosperLoanData_files/figure-latex/unnamed-chunk-2-1.pdf}
+
+\hypertarget{univariate-plot}{%
+\section{Univariate Plot}\label{univariate-plot}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\NormalTok{RawData,}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{ListingCreationDate))}\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_histogram}\NormalTok{(}\DataTypeTok{bins=}\DecValTok{200}\NormalTok{,}\DataTypeTok{fill=}\StringTok{"#567456"}\NormalTok{)}\OperatorTok{+}
+\StringTok{  }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{10}\NormalTok{),}
+          \DataTypeTok{axis.text.y =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{10}\NormalTok{, }\DataTypeTok{angle=}\DecValTok{45}\NormalTok{))}\OperatorTok{+}
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title=}\StringTok{"Listing Creation Date  "}\NormalTok{,}
+       \DataTypeTok{subtitle=}\StringTok{"The date the listing was created."}\NormalTok{,}
+       \DataTypeTok{y=}\StringTok{"Count"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prosperLoanData_files/figure-latex/unnamed-chunk-3-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Occupation_group<-}\StringTok{ }
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(RawData,Occupation)}
+
+\NormalTok{RawData.Occupation_group<-}
+\StringTok{  }\KeywordTok{summarise}\NormalTok{(Occupation_group,}\DataTypeTok{count=}\KeywordTok{n}\NormalTok{())}
+
+\NormalTok{RawData.Occupation_group<-}
+\StringTok{  }\KeywordTok{arrange}\NormalTok{(RawData.Occupation_group,}\OperatorTok{-}\NormalTok{(count))}
+
+
+
+\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data =} \KeywordTok{head}\NormalTok{(RawData.Occupation_group,}\DecValTok{10}\NormalTok{),}
+       \KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=} \KeywordTok{reorder}\NormalTok{(Occupation, }\OperatorTok{-}\NormalTok{count), }
+           \DataTypeTok{y=}\NormalTok{count))}\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_bar}\NormalTok{(}\DataTypeTok{stat =} \StringTok{"identity"}\NormalTok{)}\OperatorTok{+}
+\StringTok{  }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{10}\NormalTok{, }\DataTypeTok{angle=}\DecValTok{45}\NormalTok{,}\DataTypeTok{hjust =} \DecValTok{1}\NormalTok{))}\OperatorTok{+}
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title=}\StringTok{"Occupation "}\NormalTok{,}
+       \DataTypeTok{subtitle=}\StringTok{"The Occupation selected by the Borrower at the time they created the listing."}\NormalTok{,}
+       \DataTypeTok{x=}\StringTok{"Occupation"}\NormalTok{,}
+       \DataTypeTok{y=}\StringTok{"Count"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prosperLoanData_files/figure-latex/unnamed-chunk-4-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{RawData }\OperatorTok{%>%}\StringTok{ }\KeywordTok{count}\NormalTok{(Occupation) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{Occupation=}\KeywordTok{reorder}\NormalTok{(Occupation,}\OperatorTok{-}\NormalTok{n))}\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{filter}\NormalTok{(n}\OperatorTok{>}\KeywordTok{quantile}\NormalTok{(n,}\FloatTok{0.80}\NormalTok{))}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(Occupation, }\DataTypeTok{y =}\NormalTok{ n,}\DataTypeTok{fill=}\KeywordTok{sqrt}\NormalTok{(n)))}\OperatorTok{+}
+\StringTok{    }\KeywordTok{geom_bar}\NormalTok{(}\DataTypeTok{stat =} \StringTok{"identity"}\NormalTok{)}\OperatorTok{+}
+\StringTok{    }\KeywordTok{theme_minimal}\NormalTok{()}\OperatorTok{+}
+\StringTok{    }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size =} \DecValTok{10}\NormalTok{, }\DataTypeTok{angle=} \DecValTok{45}\NormalTok{, }\DataTypeTok{hjust=}\DecValTok{1}\NormalTok{))}\OperatorTok{+}
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title=}\StringTok{"Occupation "}\NormalTok{, }\DataTypeTok{x=}\StringTok{"Occupation"}\NormalTok{, }\DataTypeTok{y=}\StringTok{"Count"}\NormalTok{,}\DataTypeTok{fill=}\StringTok{"Sqrt(Count)"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prosperLoanData_files/figure-latex/unnamed-chunk-7-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{RawData }\OperatorTok{%>%}
+\StringTok{  }\CommentTok{#mutate(as.factor(Term))%>%}
+\StringTok{  }\CommentTok{#count(Term) %>% }
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\KeywordTok{as.factor}\NormalTok{(Term)))}\OperatorTok{+}
+\StringTok{    }\KeywordTok{geom_bar}\NormalTok{()}\OperatorTok{+}
+\StringTok{    }\KeywordTok{coord_trans}\NormalTok{(}\DataTypeTok{y=}\StringTok{'sqrt'}\NormalTok{)}\OperatorTok{+}
+\StringTok{    }\KeywordTok{theme_minimal}\NormalTok{()}\OperatorTok{+}
+\StringTok{    }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size =} \DecValTok{24}\NormalTok{))}\OperatorTok{+}
+\StringTok{    }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title=}\StringTok{"Term"}\NormalTok{, }\DataTypeTok{x=}\StringTok{"Term"}\NormalTok{, }\DataTypeTok{y=}\StringTok{"Count"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prosperLoanData_files/figure-latex/unnamed-chunk-8-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{loanstat=RawData}\OperatorTok{$}\NormalTok{LoanStatus}
+\NormalTok{RawData }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{count}\NormalTok{(LoanStatus) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{LoanStatus=}\KeywordTok{reorder}\NormalTok{(LoanStatus,}\OperatorTok{-}\NormalTok{n))}\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\CommentTok{#filter(n>quantile(n,0.20))%>%}
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{LoanStatus, }\DataTypeTok{y =} \KeywordTok{sqrt}\NormalTok{(n),}\DataTypeTok{fill=}\KeywordTok{sqrt}\NormalTok{(n)))}\OperatorTok{+}
+\StringTok{    }\KeywordTok{geom_bar}\NormalTok{(}\DataTypeTok{stat =} \StringTok{"identity"}\NormalTok{)}\OperatorTok{+}
+\StringTok{    }\CommentTok{#coord_trans(x='sqrt')+}
+\StringTok{    }\CommentTok{#coord_polar()+}
+\StringTok{    }\KeywordTok{scale_fill_viridis}\NormalTok{(}\DataTypeTok{option =} \StringTok{"A"}\NormalTok{)}\OperatorTok{+}
+\StringTok{    }\KeywordTok{theme_minimal}\NormalTok{()}\OperatorTok{+}
+\StringTok{    }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size =}\DecValTok{8}\NormalTok{, }\DataTypeTok{angle=} \DecValTok{45}\NormalTok{, }\DataTypeTok{hjust=}\DecValTok{1}\NormalTok{))}\OperatorTok{+}
+\StringTok{    }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title=}\StringTok{"Loan Status Count "}\NormalTok{, }\DataTypeTok{x=}\StringTok{"Loan Status"}\NormalTok{, }\DataTypeTok{y=}\StringTok{"Count"}\NormalTok{,}\DataTypeTok{fill=}\StringTok{"Sqrt(Count)"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prosperLoanData_files/figure-latex/unnamed-chunk-9-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{IncomeRange=RawData}\OperatorTok{$}\NormalTok{IncomeRange}
+\NormalTok{RawData }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{count}\NormalTok{(IncomeRange) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\CommentTok{#mutate(IncomeRange=reorder(IncomeRange,-n))%>% }
+\StringTok{  }\CommentTok{#filter(n>quantile(n,0.20))%>%}
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{IncomeRange, }\DataTypeTok{y =}\NormalTok{ n,}\DataTypeTok{fill=}\KeywordTok{sqrt}\NormalTok{(n)))}\OperatorTok{+}
+\StringTok{    }\KeywordTok{geom_bar}\NormalTok{(}\DataTypeTok{stat =} \StringTok{"identity"}\NormalTok{)}\OperatorTok{+}
+\StringTok{    }\CommentTok{#coord_trans(x='log')+}
+\StringTok{    }\CommentTok{#coord_polar()+}
+\StringTok{    }\CommentTok{#scale_fill_viridis(option = "A")+}
+\StringTok{    }\KeywordTok{theme_minimal}\NormalTok{()}\OperatorTok{+}
+\StringTok{    }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size =}\NormalTok{ , }\DataTypeTok{angle=} \DecValTok{45}\NormalTok{, }\DataTypeTok{hjust=}\DecValTok{1}\NormalTok{))}\OperatorTok{+}
+\StringTok{    }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title=}\StringTok{"Income Range"}\NormalTok{,}
+         \DataTypeTok{subtitle =} \StringTok{"The income range of the borrower at the time the listing was created."}\NormalTok{,}
+         \DataTypeTok{x=}\StringTok{"Income Range"}\NormalTok{,}
+         \DataTypeTok{y=}\StringTok{"Count"}\NormalTok{,}
+         \DataTypeTok{fill=}\StringTok{"Sqrt(Count)"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prosperLoanData_files/figure-latex/unnamed-chunk-10-1.pdf}
+
+EmploymentStatusDuration The length in months of the employment status
+at the time the listing was created.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{RawData}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(}\KeywordTok{is.finite}\NormalTok{(EmploymentStatusDuration))}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{EmploymentStatusDuration))}\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_histogram}\NormalTok{(}\DataTypeTok{binwidth =} \DecValTok{10}\NormalTok{,}\DataTypeTok{fill=}\StringTok{"#563ec3"}\NormalTok{)}\OperatorTok{+}
+\StringTok{   }\KeywordTok{theme_minimal}\NormalTok{()}\OperatorTok{+}
+\StringTok{    }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size =}\NormalTok{ , }\DataTypeTok{angle=} \DecValTok{45}\NormalTok{, }\DataTypeTok{hjust=}\DecValTok{1}\NormalTok{))}\OperatorTok{+}
+\StringTok{    }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title=}\StringTok{"Income Range"}\NormalTok{,}
+         \DataTypeTok{subtitle =} \StringTok{"The length in months of the employment status at the time the listing was created."}\NormalTok{,}
+         \DataTypeTok{x=}\StringTok{"Inocme Range"}\NormalTok{,}
+         \DataTypeTok{y=}\StringTok{"Count"}\NormalTok{,}
+         \DataTypeTok{fill=}\StringTok{"Sqrt(Count)"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prosperLoanData_files/figure-latex/unnamed-chunk-11-1.pdf}
+
+BorrowerRate
+
+The Borrower's interest rate for this loan.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{BorrowerRate=RawData}\OperatorTok{$}\NormalTok{BorrowerRate}
+\NormalTok{RawData}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(BorrowerRate}\OperatorTok{>}\KeywordTok{quantile}\NormalTok{(BorrowerRate,}\FloatTok{0.01}\NormalTok{))}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(BorrowerRate}\OperatorTok{<}\KeywordTok{quantile}\NormalTok{(BorrowerRate,}\FloatTok{0.99}\NormalTok{))}\OperatorTok{%>%}
+\StringTok{  }\CommentTok{#count(BorrowerRate)%>%}
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{BorrowerRate))}\OperatorTok{+}
+\StringTok{    }\KeywordTok{geom_histogram}\NormalTok{(}\DataTypeTok{bins=}\DecValTok{40}\NormalTok{,}\DataTypeTok{fill=}\StringTok{"#563ec3"}\NormalTok{)}\OperatorTok{+}
+\StringTok{    }\KeywordTok{theme_minimal}\NormalTok{()}\OperatorTok{+}
+\StringTok{    }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size =}\NormalTok{ , }\DataTypeTok{angle=} \DecValTok{45}\NormalTok{, }\DataTypeTok{hjust=}\DecValTok{1}\NormalTok{))}\OperatorTok{+}
+\StringTok{    }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title=}\StringTok{"The Borrower's interest rate for this loan.  "}\NormalTok{, }\DataTypeTok{x=}\StringTok{"Borrower Rate"}\NormalTok{, }\DataTypeTok{y=}\StringTok{"Count"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prosperLoanData_files/figure-latex/unnamed-chunk-12-1.pdf}
+
+LoanOriginalAmount
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{RawData}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(LoanOriginalAmount}\OperatorTok{!=}\DecValTok{0}\NormalTok{)}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ LoanOriginalAmount))}\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_density}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prosperLoanData_files/figure-latex/unnamed-chunk-13-1.pdf}
+
+Prosper Rating : The Prosper Rating assigned at the time the listing was
+created between AA - HR. Applicable for loans originated after July
+2009.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#levels(RawData$ProsperRating..Alpha.)}
+\NormalTok{RawData }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(RawData}\OperatorTok{$}\NormalTok{ProsperRating..Alpha.}\OperatorTok{!=}\StringTok{""}\NormalTok{)}\OperatorTok{%>%}
+\StringTok{  }\CommentTok{#filter(RawData$ListingCreationDate>2009)}
+\StringTok{  }\KeywordTok{count}\NormalTok{(ProsperRating..Alpha.) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\CommentTok{#mutate(IncomeRange=reorder(IncomeRange,-n))%>% }
+\StringTok{  }\CommentTok{#filter(n>quantile(n,0.20))%>%}
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{ProsperRating..Alpha., }\DataTypeTok{y =}\NormalTok{ n,}\DataTypeTok{fill=}\KeywordTok{sqrt}\NormalTok{(n)))}\OperatorTok{+}
+\StringTok{    }\KeywordTok{geom_bar}\NormalTok{(}\DataTypeTok{stat =} \StringTok{"identity"}\NormalTok{)}\OperatorTok{+}
+\StringTok{    }\KeywordTok{theme_minimal}\NormalTok{()}\OperatorTok{+}
+\StringTok{    }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{( ))}\OperatorTok{+}
+\StringTok{    }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title=}\StringTok{"Prosper Rating"}\NormalTok{, }\DataTypeTok{x=}\StringTok{"Prosper Rating"}\NormalTok{, }\DataTypeTok{y=}\StringTok{"Count"}\NormalTok{,}\DataTypeTok{fill=}\StringTok{"Sqrt(Count)"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prosperLoanData_files/figure-latex/unnamed-chunk-15-1.pdf}
+
+Monthly Loan Payment
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{MonthlyLoanPayment=RawData}\OperatorTok{$}\NormalTok{MonthlyLoanPayment}
+
+\NormalTok{RawData}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(MonthlyLoanPayment}\OperatorTok{>}\KeywordTok{quantile}\NormalTok{(MonthlyLoanPayment,}\FloatTok{0.01}\NormalTok{))}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(MonthlyLoanPayment}\OperatorTok{<}\KeywordTok{quantile}\NormalTok{(MonthlyLoanPayment,}\FloatTok{0.99}\NormalTok{))}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{MonthlyLoanPayment))}\OperatorTok{+}
+\StringTok{    }\KeywordTok{geom_histogram}\NormalTok{(}\DataTypeTok{bins=}\DecValTok{100}\NormalTok{,}\DataTypeTok{fill=}\StringTok{"#563ec3"}\NormalTok{)}\OperatorTok{+}
+\StringTok{    }\KeywordTok{theme_minimal}\NormalTok{()}\OperatorTok{+}
+\StringTok{    }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size =}\NormalTok{ , }\DataTypeTok{angle=} \DecValTok{45}\NormalTok{, }\DataTypeTok{hjust=}\DecValTok{1}\NormalTok{))}\OperatorTok{+}
+\StringTok{    }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title=}\StringTok{"The scheduled monthly loan payment."}\NormalTok{, }\DataTypeTok{x=}\StringTok{"Monthly Loan Payment"}\NormalTok{, }\DataTypeTok{y=}\StringTok{"Count"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prosperLoanData_files/figure-latex/unnamed-chunk-16-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{RawData}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(MonthlyLoanPayment}\OperatorTok{>}\DecValTok{125}\NormalTok{)}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(MonthlyLoanPayment}\OperatorTok{<}\DecValTok{200}\NormalTok{)}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{MonthlyLoanPayment))}\OperatorTok{+}
+\StringTok{    }\KeywordTok{geom_histogram}\NormalTok{(}\DataTypeTok{bins=}\DecValTok{300}\NormalTok{,}\DataTypeTok{fill=}\StringTok{"#563ec3"}\NormalTok{)}\OperatorTok{+}
+\StringTok{    }\KeywordTok{theme_minimal}\NormalTok{()}\OperatorTok{+}
+\StringTok{    }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size =}\NormalTok{ , }\DataTypeTok{angle=} \DecValTok{45}\NormalTok{, }\DataTypeTok{hjust=}\DecValTok{1}\NormalTok{))}\OperatorTok{+}
+\StringTok{    }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title=}\StringTok{"The scheduled monthly loan payment"}\NormalTok{, }\DataTypeTok{x=}\StringTok{"Monthly Loan Payment"}\NormalTok{, }\DataTypeTok{y=}\StringTok{"Count"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prosperLoanData_files/figure-latex/unnamed-chunk-17-1.pdf}
+
+CreditGrade
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{RawData}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(CreditGrade}\OperatorTok{!=}\StringTok{""}\NormalTok{)}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{count}\NormalTok{(CreditGrade) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{CreditGrade, }\DataTypeTok{y =}\NormalTok{ n,}\DataTypeTok{fill=}\KeywordTok{sqrt}\NormalTok{(n)))}\OperatorTok{+}
+\StringTok{    }\KeywordTok{geom_bar}\NormalTok{(}\DataTypeTok{stat =} \StringTok{"identity"}\NormalTok{)}\OperatorTok{+}
+\StringTok{    }\KeywordTok{theme_minimal}\NormalTok{()}\OperatorTok{+}
+\StringTok{    }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{( ))}\OperatorTok{+}
+\StringTok{    }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title=}\StringTok{"CreditGrade"}\NormalTok{, }\DataTypeTok{x=}\StringTok{"CreditGrade"}\NormalTok{, }\DataTypeTok{y=}\StringTok{"Count"}\NormalTok{,}\DataTypeTok{fill=}\StringTok{"Sqrt(Count)"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prosperLoanData_files/figure-latex/unnamed-chunk-18-1.pdf}
+
+LP InterestandFees
+
+Pre charge-off cumulative interest and fees paid by the borrower. If the
+loan has charged off, this value will exclude any recoveries.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{RawData}\OperatorTok{%>%}
+\StringTok{  }\CommentTok{#filter(LP_InterestandFees>quantile(MonthlyLoanPayment,0.001))%>%}
+\StringTok{  }\CommentTok{#filter(LP_InterestandFees<quantile(MonthlyLoanPayment,0.999))%>%}
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{LP_InterestandFees))}\OperatorTok{+}
+\StringTok{    }\KeywordTok{geom_histogram}\NormalTok{(}\DataTypeTok{bins=}\DecValTok{300}\NormalTok{,}\DataTypeTok{fill=}\StringTok{"#d53e6c"}\NormalTok{)}\OperatorTok{+}
+\StringTok{    }\KeywordTok{theme_minimal}\NormalTok{()}\OperatorTok{+}
+\StringTok{    }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size =}\NormalTok{ , }\DataTypeTok{angle=} \DecValTok{45}\NormalTok{, }\DataTypeTok{hjust=}\DecValTok{1}\NormalTok{))}\OperatorTok{+}
+\StringTok{    }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title=}\StringTok{"Pre charge-off cumulative interest and fees paid by the borrower"}\NormalTok{, }\DataTypeTok{x=}\StringTok{"LP InterestandFees"}\NormalTok{, }\DataTypeTok{y=}\StringTok{"Count"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prosperLoanData_files/figure-latex/unnamed-chunk-19-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{RawData}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(LP_InterestandFees}\OperatorTok{>}\KeywordTok{quantile}\NormalTok{(MonthlyLoanPayment,}\FloatTok{0.001}\NormalTok{))}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(LP_InterestandFees}\OperatorTok{<}\DecValTok{5000}\NormalTok{)}\OperatorTok{%>%}
+\StringTok{  }\CommentTok{#filter(LP_InterestandFees<quantile(MonthlyLoanPayment,0.999))%>%}
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{LP_InterestandFees))}\OperatorTok{+}
+\StringTok{    }\KeywordTok{geom_histogram}\NormalTok{(}\DataTypeTok{bins=}\DecValTok{300}\NormalTok{,}\DataTypeTok{fill=}\StringTok{"#d53e6c"}\NormalTok{)}\OperatorTok{+}
+\StringTok{    }\KeywordTok{theme_minimal}\NormalTok{()}\OperatorTok{+}
+\StringTok{    }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size =}\NormalTok{ , }\DataTypeTok{angle=} \DecValTok{45}\NormalTok{, }\DataTypeTok{hjust=}\DecValTok{1}\NormalTok{))}\OperatorTok{+}
+\StringTok{    }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title=}\StringTok{"Pre charge-off cumulative interest and fees paid by the borrower"}\NormalTok{, }\DataTypeTok{x=}\StringTok{"LP InterestandFees"}\NormalTok{, }\DataTypeTok{y=}\StringTok{"Count"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prosperLoanData_files/figure-latex/unnamed-chunk-20-1.pdf}
+
+Investors The number of investors that funded the loan.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Investors=RawData}\OperatorTok{$}\NormalTok{Investors}
+
+\NormalTok{RawData}\OperatorTok{%>%}
+\StringTok{  }\CommentTok{#filter(Investors>quantile(Investors,0.03))%>%}
+\StringTok{  }\CommentTok{#filter(Investors<600)%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(Investors}\OperatorTok{<}\KeywordTok{quantile}\NormalTok{(Investors,}\FloatTok{0.97}\NormalTok{))}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{Investors))}\OperatorTok{+}
+\StringTok{    }\KeywordTok{geom_histogram}\NormalTok{(}\DataTypeTok{bins=}\DecValTok{100}\NormalTok{,}\DataTypeTok{fill=}\StringTok{"#356e9c"}\NormalTok{)}\OperatorTok{+}
+\StringTok{    }\KeywordTok{theme_minimal}\NormalTok{()}\OperatorTok{+}
+\StringTok{    }\KeywordTok{coord_trans}\NormalTok{(}\DataTypeTok{y=}\StringTok{"sqrt"}\NormalTok{)}\OperatorTok{+}
+\StringTok{    }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size =}\NormalTok{ , }\DataTypeTok{angle=} \DecValTok{45}\NormalTok{, }\DataTypeTok{hjust=}\DecValTok{1}\NormalTok{))}\OperatorTok{+}
+\StringTok{    }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title=}\StringTok{"Investors"}\NormalTok{,}
+         \DataTypeTok{subtitle=}\StringTok{"The number of investors that funded the loan."}\NormalTok{,}
+         \DataTypeTok{x=}\StringTok{"Investors"}\NormalTok{,}
+         \DataTypeTok{y=}\StringTok{"Count"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prosperLoanData_files/figure-latex/unnamed-chunk-21-1.pdf}
+
+Employment Status Duration The length in months of the employment status
+at the time the listing was created.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{EmploymentStatusDuration=RawData}\OperatorTok{$}\NormalTok{EmploymentStatusDuration}
+\NormalTok{RawData}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(}\KeywordTok{is.finite}\NormalTok{(EmploymentStatusDuration))}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(EmploymentStatusDuration}\OperatorTok{>}\KeywordTok{quantile}\NormalTok{(EmploymentStatusDuration,}\FloatTok{0.04}\NormalTok{))}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(EmploymentStatusDuration}\OperatorTok{<}\KeywordTok{quantile}\NormalTok{(EmploymentStatusDuration,}\FloatTok{0.96}\NormalTok{))}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(EmploymentStatusDuration))}\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_histogram}\NormalTok{(}\DataTypeTok{bins=}\DecValTok{156}\NormalTok{,}\DataTypeTok{fill=}\StringTok{"#c54e74"}\NormalTok{)}\OperatorTok{+}
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title=}\StringTok{"Employment Status Duration"}\NormalTok{,}
+         \DataTypeTok{subtitle=}\StringTok{"The length in months of the employment status at the time the listing was created."}\NormalTok{,}
+         \DataTypeTok{x=}\StringTok{"Employment Status Duration"}\NormalTok{,}
+         \DataTypeTok{y=}\StringTok{"Count"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prosperLoanData_files/figure-latex/unnamed-chunk-22-1.pdf}
+
+DebtToIncomeRatio The debt to income ratio of the borrower at the time
+the credit profile was pulled. This value is Null if the debt to income
+ratio is not available. This value is capped at 10.01 (any debt to
+income ratio larger than 1000\% will be returned as 1001\%).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{RawData}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(}\KeywordTok{is.finite}\NormalTok{(DebtToIncomeRatio))}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(DebtToIncomeRatio}\OperatorTok{>}\KeywordTok{quantile}\NormalTok{(DebtToIncomeRatio,}\FloatTok{0.01}\NormalTok{))}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(DebtToIncomeRatio}\OperatorTok{<}\KeywordTok{quantile}\NormalTok{(DebtToIncomeRatio,}\FloatTok{0.99}\NormalTok{))}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(DebtToIncomeRatio))}\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_histogram}\NormalTok{(}\DataTypeTok{binwidth =} \FloatTok{0.01}\NormalTok{,}\DataTypeTok{fill=}\StringTok{"#465498"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prosperLoanData_files/figure-latex/unnamed-chunk-23-1.pdf}
+
+\hypertarget{univariate-analysis}{%
+\section{Univariate Analysis}\label{univariate-analysis}}
+
+we can see alot of information from the previos section, some propierts
+was expected others was a little superising
+
+examples : It was expected to get some pattern in loan value to tend to
+get some pattern (1000 , 5000 , 10000, 15000 ) personally I was expecte
+a equal distrupitoin in loan Term, nevertheless it was manily in 36
+monthes the in come range for the borrower is normally distrupited as
+expected the most interesting thing was the mode in monthly loan payment
+around 175 \$ I think there is some requlation in united state reinforce
+this amount of monthly payment. something unexpect also the drop in the
+entreing date between 2009 and 2010 I think this because of integration
+into new system
+
+\#Bivariate Plots Section
+
+Year and Investor per loan
+\includegraphics{prosperLoanData_files/figure-latex/Univariate_Plots-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{RawData}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(}\OperatorTok{!}\NormalTok{IncomeRange }\OperatorTok{%in%}\StringTok{ }\KeywordTok{list}\NormalTok{(}\StringTok{"Not displayed"}\NormalTok{,}\StringTok{"$0"}\NormalTok{) )}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{ListingCreationDate,}\DataTypeTok{fill=}\KeywordTok{reorder}\NormalTok{(IncomeRange,}\OperatorTok{-}\KeywordTok{table}\NormalTok{(IncomeRange)[IncomeRange])))}\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_histogram}\NormalTok{(}\DataTypeTok{bins=}\DecValTok{300}\NormalTok{)}\OperatorTok{+}
+\StringTok{  }\KeywordTok{coord_trans}\NormalTok{(}\DataTypeTok{y=}\StringTok{"sqrt"}\NormalTok{)}\OperatorTok{+}
+\StringTok{  }\KeywordTok{scale_fill_brewer}\NormalTok{(}\DataTypeTok{palette =} \DecValTok{1}\NormalTok{,}\DataTypeTok{direction =} \DecValTok{-1}\NormalTok{)}\OperatorTok{+}
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title=}\StringTok{"Income Range in time "}\NormalTok{,}
+       \DataTypeTok{subtitle=}\StringTok{"he income range of the borrower at the time the listing was created."}\NormalTok{,}
+       \DataTypeTok{x=}\StringTok{"Listing Creation Date"}\NormalTok{,}
+       \DataTypeTok{y=}\StringTok{"Count"}\NormalTok{,}
+       \DataTypeTok{fill=}\StringTok{"IncomeRange"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prosperLoanData_files/figure-latex/unnamed-chunk-24-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{RawData}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(}\OperatorTok{!}\NormalTok{CreditGrade}\OperatorTok{==}\StringTok{""}\NormalTok{)}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{ListingCreationDate,}\DataTypeTok{fill=}\NormalTok{CreditGrade))}\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_histogram}\NormalTok{(}\DataTypeTok{bins=}\DecValTok{300}\NormalTok{)}\OperatorTok{+}
+\StringTok{  }\KeywordTok{coord_trans}\NormalTok{(}\DataTypeTok{y=}\StringTok{"sqrt"}\NormalTok{)}\OperatorTok{+}
+\StringTok{  }\KeywordTok{scale_fill_brewer}\NormalTok{(}\DataTypeTok{palette =} \DecValTok{3}\NormalTok{,}\DataTypeTok{type =} \StringTok{"div"}\NormalTok{,}\DataTypeTok{direction =} \DecValTok{-1}\NormalTok{)}\OperatorTok{+}
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title=}\StringTok{"CreditGrade "}\NormalTok{,}
+       \DataTypeTok{subtitle=}\StringTok{"The Credit rating that was assigned at the time the listing went live. Applicable for listings pre-2009"}\NormalTok{,}
+       \DataTypeTok{x=}\StringTok{"Listing Creation Date"}\NormalTok{,}
+       \DataTypeTok{y=}\StringTok{"Count"}\NormalTok{,}
+       \DataTypeTok{fill=}\StringTok{"CreditGrade"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prosperLoanData_files/figure-latex/unnamed-chunk-25-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{RawData}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(}\OperatorTok{!}\NormalTok{CreditGrade}\OperatorTok{==}\StringTok{""}\NormalTok{)}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{ListingCreationDate,}\DataTypeTok{fill=}\NormalTok{CreditGrade))}\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_density}\NormalTok{(}\DataTypeTok{alpha=}\FloatTok{0.4}\NormalTok{)}\OperatorTok{+}
+\StringTok{  }\KeywordTok{scale_fill_brewer}\NormalTok{(}\DataTypeTok{palette =}\StringTok{"Set3"}\NormalTok{ ,}\DataTypeTok{type =} \StringTok{"seq"}\NormalTok{,}\DataTypeTok{direction =} \DecValTok{-1}\NormalTok{)}\OperatorTok{+}
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title=}\StringTok{"CreditGrade "}\NormalTok{,}
+       \DataTypeTok{subtitle=}\StringTok{"The Credit rating that was assigned at the time the listing went live. Applicable for listings pre-2009"}\NormalTok{,}
+       \DataTypeTok{x=}\StringTok{"Listing Creation Date"}\NormalTok{,}
+       \DataTypeTok{y=}\StringTok{"Count"}\NormalTok{,}
+       \DataTypeTok{fill=}\StringTok{"CreditGrade"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prosperLoanData_files/figure-latex/unnamed-chunk-26-1.pdf}
+
+Monthly Loan Payment vs time
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{RawData }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(MonthlyLoanPayment}\OperatorTok{>}\KeywordTok{quantile}\NormalTok{(MonthlyLoanPayment,}\FloatTok{0.02}\NormalTok{))}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(MonthlyLoanPayment}\OperatorTok{<}\KeywordTok{quantile}\NormalTok{(MonthlyLoanPayment,}\FloatTok{0.98}\NormalTok{))}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{ListingCreationDate,}\DataTypeTok{y=}\NormalTok{MonthlyLoanPayment))}\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_jitter}\NormalTok{(}\DataTypeTok{alpha=}\FloatTok{0.01}\NormalTok{,}\DataTypeTok{color=}\StringTok{"red"}\NormalTok{)}\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_smooth}\NormalTok{(}\DataTypeTok{method=}\StringTok{"auto"}\NormalTok{,}\DataTypeTok{level=}\FloatTok{0.5}\NormalTok{,}\DataTypeTok{span=}\FloatTok{0.3}\NormalTok{,}\DataTypeTok{n=}\DecValTok{100}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = "cs")'
+\end{verbatim}
+
+\includegraphics{prosperLoanData_files/figure-latex/unnamed-chunk-27-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{topOcc=}\KeywordTok{levels}\NormalTok{(}\KeywordTok{reorder}\NormalTok{(RawData}\OperatorTok{$}\NormalTok{Occupation, }\OperatorTok{-}\KeywordTok{table}\NormalTok{(RawData}\OperatorTok{$}\NormalTok{Occupation)[RawData}\OperatorTok{$}\NormalTok{Occupation]))[}\DecValTok{0}\OperatorTok{:}\DecValTok{15}\NormalTok{]}
+\NormalTok{RawData}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(Occupation }\OperatorTok{%in%}\StringTok{ }\NormalTok{topOcc)}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\KeywordTok{reorder}\NormalTok{(Occupation, }\OperatorTok{-}\KeywordTok{table}\NormalTok{(Occupation)[Occupation]),}\DataTypeTok{fill=}\NormalTok{LoanStatus))}\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_bar}\NormalTok{()}\OperatorTok{+}
+\StringTok{  }\KeywordTok{coord_trans}\NormalTok{(}\DataTypeTok{y=}\StringTok{"sqrt"}\NormalTok{)}\OperatorTok{+}
+\StringTok{  }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{6}\NormalTok{, }\DataTypeTok{angle=}\DecValTok{90}\NormalTok{,}\DataTypeTok{hjust =} \DecValTok{1}\NormalTok{))}\OperatorTok{+}
+\StringTok{  }\CommentTok{#scale_fill_brewer(palette = "Spectral")+}
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title=}\StringTok{"Occupation "}\NormalTok{, }\DataTypeTok{x=}\StringTok{"Occupation"}\NormalTok{, }\DataTypeTok{y=}\StringTok{"Count"}\NormalTok{,}\DataTypeTok{fill=}\StringTok{" Loan Status"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prosperLoanData_files/figure-latex/unnamed-chunk-28-1.pdf}
+
+levels(RawData\$LoanStatus)\textless{}-c( ``Completed'', ``Cancelled'',
+``Chargedoff'', ``Current'', ``Defaulted'', ``FinalPaymentInProgress'',
+``Past Due (1-15 days)'', ``Past Due (16-30 days)'', ``Past Due (31-60
+days)'', ``Past Due (61-90 days)'', ``Past Due (91-120 days)'', ``Past
+Due (\textgreater{}120 days)'' )
+
+levels(RawData\$LoanStatus)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{topOcc=}\KeywordTok{levels}\NormalTok{(}\KeywordTok{reorder}\NormalTok{(RawData}\OperatorTok{$}\NormalTok{Occupation,}\OperatorTok{+-}\KeywordTok{table}\NormalTok{(RawData}\OperatorTok{$}\NormalTok{Occupation)[RawData}\OperatorTok{$}\NormalTok{Occupation]))[}\DecValTok{0}\OperatorTok{:}\DecValTok{19}\NormalTok{]}
+\NormalTok{RawData }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(LoanStatus}\OperatorTok{!=}\StringTok{"Defaulted"}\NormalTok{)}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(Occupation }\OperatorTok{%in%}\StringTok{ }\NormalTok{topOcc)}\OperatorTok{%>%}
+\StringTok{  }\CommentTok{#filter(!Occupation=="")%>%}
+\StringTok{  }\CommentTok{#filter(!LoanStatus=="")%>%}
+\StringTok{  }\KeywordTok{count}\NormalTok{(Occupation,LoanStatus)}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\KeywordTok{reorder}\NormalTok{(Occupation, }\OperatorTok{-}\KeywordTok{table}\NormalTok{(Occupation)[Occupation]),}\DataTypeTok{fill=}\NormalTok{LoanStatus,}\DataTypeTok{y=}\NormalTok{n))}\OperatorTok{+}
+\StringTok{    }\KeywordTok{geom_bar}\NormalTok{(}\DataTypeTok{stat =} \StringTok{"identity"}\NormalTok{)}\OperatorTok{+}
+\StringTok{    }\KeywordTok{coord_trans}\NormalTok{(}\DataTypeTok{y=}\StringTok{"sqrt"}\NormalTok{)}\OperatorTok{+}
+\StringTok{    }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{6}\NormalTok{, }\DataTypeTok{angle=}\DecValTok{90}\NormalTok{,}\DataTypeTok{hjust =} \DecValTok{1}\NormalTok{))}\OperatorTok{+}
+\StringTok{    }\KeywordTok{scale_fill_brewer}\NormalTok{(}\DataTypeTok{palette =} \StringTok{"RdYlBu"}\NormalTok{)}\OperatorTok{+}
+\StringTok{    }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title=}\StringTok{"Occupation "}\NormalTok{, }\DataTypeTok{x=}\StringTok{"Occupation"}\NormalTok{, }\DataTypeTok{y=}\StringTok{"Count"}\NormalTok{,}\DataTypeTok{fill=}\StringTok{" Loan Status"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prosperLoanData_files/figure-latex/unnamed-chunk-29-1.pdf}
+
+topOcc=levels(reorder(RawData\(Occupation,+-table(RawData\)Occupation){[}RawData\$Occupation{]})){[}0:19{]}
+RawData \%\textgreater{}\%
+filter(LoanStatus!=``Defaulted'')\%\textgreater{}\% filter(Occupation
+\%in\% topOcc)\%\textgreater{}\%
+\#filter(!Occupation=="``)\%\textgreater{}\%
+\#filter(!LoanStatus==''``)\%\textgreater{}\%
+count(Occupation,LoanStatus)\%\textgreater{}\%
+ggplot(aes(x=reorder(Occupation,
+-table(Occupation){[}Occupation{]}),fill=LoanStatus,y=n))+
+geom\_bar(stat =''identity``)+ coord\_trans(y=''sqrt``)+
+theme(axis.text.x = element\_text(size=6, angle=90,hjust = 1))+
+scale\_fill\_brewer(palette =''RdYlBu``)+ labs(title=''Occupation ``,
+x=''Occupation``, y=''Count``,fill='' Loan Status")
+
+Term vs Time Creating,
+
+Term vs Investors
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{RawData}\OperatorTok{%>%}
+\StringTok{  }
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{LoanOriginalAmount, }\DataTypeTok{y=}\KeywordTok{as.factor}\NormalTok{(Term), }\DataTypeTok{fill=}\FloatTok{0.5} \OperatorTok{-}\StringTok{ }\KeywordTok{abs}\NormalTok{(}\FloatTok{0.5}\OperatorTok{-}\NormalTok{..ecdf..))) }\OperatorTok{+}
+\StringTok{    }\KeywordTok{stat_density_ridges}\NormalTok{(}\DataTypeTok{geom =} \StringTok{"density_ridges_gradient"}\NormalTok{, }\DataTypeTok{calc_ecdf =} \OtherTok{TRUE}\NormalTok{) }\OperatorTok{+}
+\StringTok{    }\KeywordTok{scale_fill_viridis}\NormalTok{(}\DataTypeTok{name =} \StringTok{"Tail probability"}\NormalTok{, }\DataTypeTok{direction =} \DecValTok{-1}\NormalTok{)}\OperatorTok{+}
+\StringTok{    }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size =}\NormalTok{ , }\DataTypeTok{angle=} \DecValTok{45}\NormalTok{, }\DataTypeTok{hjust=}\DecValTok{1}\NormalTok{))}\OperatorTok{+}
+\StringTok{    }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title=}\StringTok{"Investors"}\NormalTok{,}
+         \DataTypeTok{subtitle=}\StringTok{"The number of investors that funded the loan."}\NormalTok{,}
+         \DataTypeTok{x=}\StringTok{"Investors"}\NormalTok{,}
+         \DataTypeTok{y=}\StringTok{"Term"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Picking joint bandwidth of 522
+\end{verbatim}
+
+\includegraphics{prosperLoanData_files/figure-latex/unnamed-chunk-30-1.pdf}
+DebtToIncomeRatio vs BorrowerRate
+
+RawData\%\textgreater{}\%
+filter(BorrowerRate\textgreater{}quantile(BorrowerRate,0.01))\%\textgreater{}\%
+filter(BorrowerRate\textless{}quantile(BorrowerRate,0.99))\%\textgreater{}\%
+\#count(BorrowerRate)\%\textgreater{}\% ggplot(aes(x=BorrowerRate))+
+geom\_histogram(bins=40,fill=``\#563ec3'')+ theme\_minimal()+
+theme(axis.text.x = element\_text(size = , angle= 45, hjust=1))+
+labs(title=``The Borrower's interest rate for this loan.'', x=``Borrower
+Rate'', y=``Count'')
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{RawData}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(}\KeywordTok{is.finite}\NormalTok{(DebtToIncomeRatio))}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(DebtToIncomeRatio}\OperatorTok{>}\KeywordTok{quantile}\NormalTok{(DebtToIncomeRatio,}\FloatTok{0.01}\NormalTok{))}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(DebtToIncomeRatio}\OperatorTok{<}\KeywordTok{quantile}\NormalTok{(DebtToIncomeRatio,}\FloatTok{0.99}\NormalTok{))}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(BorrowerRate}\OperatorTok{>}\KeywordTok{quantile}\NormalTok{(BorrowerRate,}\FloatTok{0.01}\NormalTok{))}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(BorrowerRate}\OperatorTok{<}\KeywordTok{quantile}\NormalTok{(BorrowerRate,}\FloatTok{0.99}\NormalTok{))}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{DebtToIncomeRatio,}\DataTypeTok{y=}\NormalTok{BorrowerRate))}\OperatorTok{+}
+\StringTok{    }\KeywordTok{geom_jitter}\NormalTok{(}\DataTypeTok{alpha=}\FloatTok{0.05}\NormalTok{,}\DataTypeTok{color=}\StringTok{"#f65436"}\NormalTok{)}\OperatorTok{+}
+\StringTok{    }\KeywordTok{geom_smooth}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = "cs")'
+\end{verbatim}
+
+\includegraphics{prosperLoanData_files/figure-latex/unnamed-chunk-31-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{cor.test}\NormalTok{(RawData}\OperatorTok{$}\NormalTok{DebtToIncomeRatio,RawData}\OperatorTok{$}\NormalTok{BorrowerRate)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  Pearson's product-moment correlation
+## 
+## data:  RawData$DebtToIncomeRatio and RawData$BorrowerRate
+## t = 20.465, df = 105380, p-value < 2.2e-16
+## alternative hypothesis: true correlation is not equal to 0
+## 95 percent confidence interval:
+##  0.05690080 0.06892819
+## sample estimates:
+##        cor 
+## 0.06291678
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{RawData}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(}\KeywordTok{is.finite}\NormalTok{(LoanOriginalAmount))}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(LoanOriginalAmount}\OperatorTok{>}\KeywordTok{quantile}\NormalTok{(LoanOriginalAmount,}\FloatTok{0.01}\NormalTok{))}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(LoanOriginalAmount}\OperatorTok{<}\KeywordTok{quantile}\NormalTok{(LoanOriginalAmount,}\FloatTok{0.99}\NormalTok{))}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(BorrowerRate}\OperatorTok{>}\KeywordTok{quantile}\NormalTok{(BorrowerRate,}\FloatTok{0.01}\NormalTok{))}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(BorrowerRate}\OperatorTok{<}\KeywordTok{quantile}\NormalTok{(BorrowerRate,}\FloatTok{0.99}\NormalTok{))}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{LoanOriginalAmount,}\DataTypeTok{y=}\NormalTok{BorrowerRate))}\OperatorTok{+}
+\StringTok{    }\KeywordTok{geom_point}\NormalTok{(}\DataTypeTok{alpha=}\FloatTok{0.05}\NormalTok{,}\DataTypeTok{color=}\StringTok{"#f65436"}\NormalTok{)}\OperatorTok{+}
+\StringTok{    }\KeywordTok{geom_smooth}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = "cs")'
+\end{verbatim}
+
+\includegraphics{prosperLoanData_files/figure-latex/unnamed-chunk-33-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{cor.test}\NormalTok{(RawData}\OperatorTok{$}\NormalTok{LoanOriginalAmount,RawData}\OperatorTok{$}\NormalTok{BorrowerRate)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  Pearson's product-moment correlation
+## 
+## data:  RawData$LoanOriginalAmount and RawData$BorrowerRate
+## t = -117.58, df = 113940, p-value < 2.2e-16
+## alternative hypothesis: true correlation is not equal to 0
+## 95 percent confidence interval:
+##  -0.3341283 -0.3237719
+## sample estimates:
+##        cor 
+## -0.3289599
+\end{verbatim}
+
+\#Bivariate Analysis
+
+what interesing her that in creditGrade there was type NC only before
+2009
+
+\hypertarget{multivariate-plots-section}{%
+\section{Multivariate Plots Section}\label{multivariate-plots-section}}
+
+ocppuaptin
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{RawData}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(Occupation }\OperatorTok{%in%}\StringTok{ }\NormalTok{topOcc)}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\KeywordTok{reorder}\NormalTok{(Occupation,}\OperatorTok{-}\KeywordTok{table}\NormalTok{(Occupation)[Occupation]),}
+             \DataTypeTok{y=}\NormalTok{LoanOriginalAmount,}
+             \DataTypeTok{fill=}\KeywordTok{reorder}\NormalTok{(EmploymentStatus,}\OperatorTok{-}\KeywordTok{table}\NormalTok{(EmploymentStatus)[EmploymentStatus])}
+\NormalTok{             ))}\OperatorTok{+}
+\StringTok{    }\CommentTok{#geom_bar(stat="identity",alpha=0.5)+}
+\StringTok{    }\KeywordTok{geom_bar}\NormalTok{(}\DataTypeTok{stat=}\StringTok{"identity"}\NormalTok{)}\OperatorTok{+}
+\StringTok{    }\KeywordTok{scale_fill_viridis_d}\NormalTok{(}\DataTypeTok{option =} \StringTok{"D"}\NormalTok{,}\DataTypeTok{direction =} \DecValTok{-1}\NormalTok{)}\OperatorTok{+}
+\StringTok{    }\CommentTok{#coord_trans(y="sqrt")+}
+\StringTok{    }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{6}\NormalTok{, }\DataTypeTok{angle=}\DecValTok{90}\NormalTok{,}\DataTypeTok{hjust =} \DecValTok{1}\NormalTok{))}\OperatorTok{+}
+\StringTok{    }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title=}\StringTok{"Occupation, Employment status, and total orignal ammont"}\NormalTok{, }
+         \DataTypeTok{x=}\StringTok{"Occupation"}\NormalTok{,}
+         \DataTypeTok{y=}\StringTok{"Total Original Amount"}\NormalTok{,}
+         \DataTypeTok{fill=}\StringTok{" EmploymentStatus"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prosperLoanData_files/figure-latex/unnamed-chunk-35-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{RawData}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(ProsperRating..Alpha.}\OperatorTok{!=}\StringTok{""}\NormalTok{)}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(}\KeywordTok{is.finite}\NormalTok{(MonthlyLoanPayment))}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(BorrowerRate}\OperatorTok{>}\KeywordTok{quantile}\NormalTok{(BorrowerRate,}\FloatTok{0.01}\NormalTok{))}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(BorrowerRate}\OperatorTok{<}\KeywordTok{quantile}\NormalTok{(BorrowerRate,}\FloatTok{0.99}\NormalTok{))}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(MonthlyLoanPayment}\OperatorTok{>}\KeywordTok{quantile}\NormalTok{(MonthlyLoanPayment,}\FloatTok{0.01}\NormalTok{))}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(MonthlyLoanPayment}\OperatorTok{<}\KeywordTok{quantile}\NormalTok{(MonthlyLoanPayment,}\FloatTok{0.99}\NormalTok{))}\OperatorTok{%>%}
+\StringTok{  }\CommentTok{#filter(Investors>quantile(Investors,0.01))%>%}
+\StringTok{  }\CommentTok{#filter(Investors<quantile(Investors,0.99))%>%}
+\StringTok{  }\CommentTok{#filter(LoanOriginalAmount!=0)%>%}
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{y=}\NormalTok{MonthlyLoanPayment   ,}\DataTypeTok{x=}\NormalTok{BorrowerRate  ,}\DataTypeTok{color=}\NormalTok{ProsperRating..Alpha.  ))}\OperatorTok{+}
+\StringTok{      }\KeywordTok{geom_point}\NormalTok{(}\DataTypeTok{alpha=}\FloatTok{0.2}\NormalTok{)}\OperatorTok{+}
+\StringTok{      }\KeywordTok{scale_color_viridis_d}\NormalTok{(}\DataTypeTok{option =} \StringTok{"D"}\NormalTok{)}\OperatorTok{+}
+\StringTok{      }\CommentTok{#coord_trans(y="sqrt")+}
+\StringTok{      }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{6}\NormalTok{, }\DataTypeTok{angle=}\FloatTok{0.1}\NormalTok{,}\DataTypeTok{hjust =} \DecValTok{1}\NormalTok{))}\OperatorTok{+}
+\StringTok{      }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title=}\StringTok{"BorrowerRate,Monthly Loan Payment, Prosper Rating"}\NormalTok{, }
+           \DataTypeTok{x=}\StringTok{"Borrower Rate"}\NormalTok{,}
+           \DataTypeTok{color=}\StringTok{"Prosper Rating "}\NormalTok{,}
+           \DataTypeTok{y=}\StringTok{"Monthly Loan Payment"}\NormalTok{,}
+           \DataTypeTok{alpha=}\DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prosperLoanData_files/figure-latex/unnamed-chunk-36-1.pdf}
+
+\hypertarget{multivariate-analysis}{%
+\section{Multivariate Analysis}\label{multivariate-analysis}}
+
+we can see the pattern in between montly loan payment , borrower rate
+and the proposer rate.
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\hypertarget{final-plots-and-summary.}{%
+\section{Final Plots and Summary.}\label{final-plots-and-summary.}}
+
+\hypertarget{plot-one}{%
+\subsubsection{Plot One}\label{plot-one}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{RawData }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(Occupation}\OperatorTok{!=}\StringTok{"Other"}\NormalTok{ )}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(Occupation}\OperatorTok{!=}\StringTok{"Professional"}\NormalTok{ )}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(Occupation}\OperatorTok{!=}\StringTok{""}\NormalTok{)}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{count}\NormalTok{(Occupation) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{Occupation=}\KeywordTok{reorder}\NormalTok{(Occupation,}\OperatorTok{-}\NormalTok{n))}\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{filter}\NormalTok{(n}\OperatorTok{>}\KeywordTok{quantile}\NormalTok{(n,}\FloatTok{0.70}\NormalTok{))}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{Occupation, }\DataTypeTok{y =}\NormalTok{ n,}\DataTypeTok{fill=}\KeywordTok{sqrt}\NormalTok{(n)))}\OperatorTok{+}
+\StringTok{    }\KeywordTok{geom_bar}\NormalTok{(}\DataTypeTok{stat =} \StringTok{"identity"}\NormalTok{)}\OperatorTok{+}
+\StringTok{    }\CommentTok{#scale_fill_viridis(option = "D")+}
+\StringTok{    }\KeywordTok{theme_minimal}\NormalTok{()}\OperatorTok{+}
+\StringTok{    }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size =} \DecValTok{8}\NormalTok{, }\DataTypeTok{angle=} \DecValTok{60}\NormalTok{, }\DataTypeTok{hjust=}\DecValTok{1}\NormalTok{))}\OperatorTok{+}
+\StringTok{    }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title=}\StringTok{"Occupation "}\NormalTok{, }\DataTypeTok{x=}\StringTok{"Occupation"}\NormalTok{, }\DataTypeTok{y=}\StringTok{"Count"}\NormalTok{,}\DataTypeTok{fill=}\StringTok{"Sqrt(Count)"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prosperLoanData_files/figure-latex/unnamed-chunk-37-1.pdf}
+
+this plot describe what is the distruption of loans count regarding the
+profession after discared the misinformative occpuation like (other,
+profession) so we can suggest wich field of worker in the next campigns
+to target to get some more sales
+
+\hypertarget{plot-two}{%
+\subsubsection{Plot Two}\label{plot-two}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{RawData}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{ListingCreationDate,}\DataTypeTok{fill=}\KeywordTok{as.factor}\NormalTok{(Term)))}\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_density}\NormalTok{(}\DataTypeTok{alpha=}\FloatTok{0.6}\NormalTok{)}\OperatorTok{+}
+\StringTok{  }\KeywordTok{scale_fill_brewer}\NormalTok{(}\DataTypeTok{palette =} \StringTok{"Set2"}\NormalTok{,}\DataTypeTok{direction =} \DecValTok{1}\NormalTok{)}\OperatorTok{+}
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title=}\StringTok{"Term "}\NormalTok{,}
+       \DataTypeTok{subtitle=}\StringTok{"The length of the loan expressed in months."}\NormalTok{,}
+       \DataTypeTok{x=}\StringTok{"Listing Creation Date"}\NormalTok{,}
+       \DataTypeTok{y=}\StringTok{"Density"}\NormalTok{,}
+       \DataTypeTok{fill=}\StringTok{"CreditGrade"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prosperLoanData_files/figure-latex/unnamed-chunk-38-1.pdf}
+
+In this plot we can answer our quesiotn in univaraible examination which
+was a little bit surprising why the 36 is the most likable loan we can
+see that other types are only started after 2009 ( maybe of reugaltion)
+also the other type of loan ( 12 ) is no available any more inspite of
+it was very popular I think there's a good markt opprtuinity in prompt
+again this type of Loan
+
+\hypertarget{plot-loanoriginalamount-vs-monthlyloanpayment-term}{%
+\subsubsection{Plot LoanOriginalAmount vs MonthlyLoanPayment ,
+Term}\label{plot-loanoriginalamount-vs-monthlyloanpayment-term}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{RawData}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(MonthlyLoanPayment}\OperatorTok{>}\KeywordTok{quantile}\NormalTok{(MonthlyLoanPayment,}\FloatTok{0.01}\NormalTok{))}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(MonthlyLoanPayment}\OperatorTok{<}\KeywordTok{quantile}\NormalTok{(MonthlyLoanPayment,}\FloatTok{0.99}\NormalTok{))}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(LoanOriginalAmount}\OperatorTok{!=}\DecValTok{0}\NormalTok{)}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{y=}\NormalTok{LoanOriginalAmount,}\DataTypeTok{x=}\NormalTok{MonthlyLoanPayment,}\DataTypeTok{color=}\KeywordTok{as.factor}\NormalTok{(Term)))}\OperatorTok{+}
+\StringTok{      }\KeywordTok{geom_point}\NormalTok{(}\DataTypeTok{alpha=}\FloatTok{0.3}\NormalTok{)}\OperatorTok{+}
+\StringTok{      }\KeywordTok{scale_color_viridis_d}\NormalTok{(}\DataTypeTok{option=}\StringTok{"D"}\NormalTok{)}\OperatorTok{+}
+\StringTok{      }\KeywordTok{scale_fill_viridis_d}\NormalTok{(}\DataTypeTok{option =} \StringTok{"D"}\NormalTok{,}\DataTypeTok{direction =} \DecValTok{-1}\NormalTok{)}\OperatorTok{+}
+\StringTok{      }\CommentTok{#coord_trans(y="sqrt")+}
+\StringTok{      }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{6}\NormalTok{, }\DataTypeTok{angle=}\DecValTok{90}\NormalTok{,}\DataTypeTok{hjust =} \DecValTok{1}\NormalTok{))}\OperatorTok{+}
+\StringTok{      }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title=}\StringTok{"Occupation, Employment status, and loan orignal ammont"}\NormalTok{, }
+           \DataTypeTok{x=}\StringTok{"Monthly Loan Payment"}\NormalTok{,}
+           \DataTypeTok{y=}\StringTok{"Loan Original Amount"}\NormalTok{,}
+           \DataTypeTok{color=}\StringTok{"Term in Monthes"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prosperLoanData_files/figure-latex/unnamed-chunk-39-1.pdf}
+
+In the preivous plot we can easly see the relation between the three
+variabls and the lineartiy is obvious
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\hypertarget{reflection}{%
+\section{Reflection}\label{reflection}}
+
+we have explored myn variabls and this data set is really very
+informative, I wish i had the time to dig more and explore an extra
+ready variblas or calculated supported ones espeically the last plot
+descripe the realtion between the variables
+
+
+\end{document}

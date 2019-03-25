@@ -1,9 +1,14 @@
-TITLE by Wessam Alhallak
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+Exploring Loan Data by Wessam Alhallak
 ========================================================
 
 ---
-title: "ExploreAndSummarize"
-author: "WessamAlhallak"
+title: "Exploring Loan Data"
+author: "Wessam Alhallak"
 date: "11 März 2019"
 output: html_document
 ---
@@ -53,22 +58,9 @@ RawData$ListingCreationDate<-
 This data set contains 113,937 loans with 81 variables on each loan,including loan amount,borrower rate (orinterest rate), currentloan status, borrowerincome, borroweremployment status,borrower credit history,and the latest paymentinformation.
 And I will list my interested Variables  after reading the descriptions of each varaibles
 
-ListingCreationDate
-Term
-LoanStatus
-IncomeRange
-BorrowerRate
-ProsperRatig
-Occupation
-EmploymentStatus
-EmploymentStatusDuration
-DebtToIncomeRatio
-IncomeRange
-MonthlyLoanPayment
-LP_InterestandFees
-Investors
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, packages}
+
+```{r message=FALSE, warning=FALSE, packages}
 
 intData=RawData%>%select(ListingCreationDate,
                          Term,
@@ -94,7 +86,7 @@ about the realtion between each two variables and then we try to get in depth be
 than two variables in mulitvariable section finally I will reflect my conclusinios in 
 the last section #conclusion
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
+```{r  message=FALSE, warning=FALSE, paged.print=TRUE}
 ggpairs(intData[sample.int(nrow(intData),1000),],cardinality_threshold=100)
 
 ```
@@ -706,7 +698,7 @@ RawData%>%
 ```
 
 
-```{r echo=FALSE, Plot_Three}
+```{r}
 
 RawData%>%
   filter(ProsperRating..Alpha.!="")%>%
@@ -741,7 +733,7 @@ we can see the pattern in between montly loan payment , borrower rate and the pr
 # Final Plots and Summary.
 
 ### Plot One
-```{r echo=FALSE, Plot_One}
+```{r}
 
 RawData %>%
   filter(Occupation!="Other" )%>%
@@ -792,7 +784,7 @@ this type of Loan
 
 
 ### Plot LoanOriginalAmount	vs MonthlyLoanPayment	, Term
-```{r echo=FALSE}
+```{r}
 
 RawData%>%
   filter(MonthlyLoanPayment>quantile(MonthlyLoanPayment,0.01))%>%
@@ -812,7 +804,7 @@ RawData%>%
 ```
 
 
-In the preivous plot we can easly see the relation between the three variabls .and the lineartiy is obvious 
+In the preivous plot we can easly see the relation between the three variabls and the lineartiy is obvious 
 
 
 ------
