@@ -47,6 +47,7 @@ library(reshape2)
 library(alr3)
 library(forcats)
 library(viridis)
+library(Hmisc)
 ```
 
 ```{r echo=FALSE, Load_the_Data}
@@ -240,7 +241,6 @@ RawData%>%
          fill="Sqrt(Count)")
 ```
 
-```
 
 
 
@@ -279,7 +279,7 @@ RawData%>%
 Prosper Rating :
 The Prosper Rating assigned at the time the listing was created between AA - HR.  Applicable for loans originated after July 2009.
 ```{r}
-levels(RawData$ProsperRating..Alpha.)
+#levels(RawData$ProsperRating..Alpha.)
 RawData %>%
   filter(RawData$ProsperRating..Alpha.!="")%>%
   #filter(RawData$ListingCreationDate>2009)
@@ -417,27 +417,18 @@ RawData%>%
   
 ```
 
+DebtToIncomeRatio
+The debt to income ratio of the borrower at the time the credit profile was pulled. This value is Null if the debt to income ratio is not available. This value is capped at 10.01 (any debt to income ratio larger than 1000% will be returned as 1001%).
 
+```{r}
+RawData%>%
+  filter(is.finite(DebtToIncomeRatio))%>%
+  filter(DebtToIncomeRatio>quantile(DebtToIncomeRatio,0.01))%>%
+  filter(DebtToIncomeRatio<quantile(DebtToIncomeRatio,0.99))%>%
+  ggplot(aes(DebtToIncomeRatio))+
+  geom_histogram(binwidth = 0.01,fill="#465498")
 
-
-theme_set(theme_classic())
-
-# Histogram on a Continuous (Numeric) Variable
-g <- ggplot(mpg, aes(displ)) + scale_fill_brewer(palette = "Spectral")
-
-g + geom_histogram(aes(fill=class), 
-                   binwidth = .1, 
-                   col="black", 
-                   size=.1) +  # change binwidth
-  labs(title="Histogram with Auto Binning", 
-       subtitle="Engine Displacement across Vehicle Classes") 
-
-g + geom_histogram(aes(fill=class), 
-                   bins=5, 
-                   col="black", 
-                   size=.1) +   # change number of bins
-  labs(title="Histogram with Fixed Bins", 
-       subtitle="Engine Displacement across Vehicle Classes") 
+```
 
 
 
@@ -590,8 +581,8 @@ RawData %>%
     scale_fill_brewer(palette = "RdYlBu")+
     labs(title="Occupation ", x="Occupation", y="Count",fill=" Loan Status")
     
-Term vs Time, 
-Term vs Investors
+Term vs Time Creating, 
+
 ```{r}
 
 RawData%>%
@@ -623,29 +614,55 @@ RawData%>%
          x="Investors",
          y="Term")
 ```
+DebtToIncomeRatio vs BorrowerRate
 
+  
+RawData%>%
+  filter(BorrowerRate>quantile(BorrowerRate,0.01))%>%
+  filter(BorrowerRate<quantile(BorrowerRate,0.99))%>%
+  #count(BorrowerRate)%>%
+  ggplot(aes(x=BorrowerRate))+
+    geom_histogram(bins=40,fill="#563ec3")+
+    theme_minimal()+
+    theme(axis.text.x = element_text(size = , angle= 45, hjust=1))+
+    labs(title="The Borrower's interest rate for this loan.  ", x="Borrower Rate", y="Count")
 
 ```{r}
+RawData%>%
+  filter(is.finite(DebtToIncomeRatio))%>%
+  filter(DebtToIncomeRatio>quantile(DebtToIncomeRatio,0.01))%>%
+  filter(DebtToIncomeRatio<quantile(DebtToIncomeRatio,0.99))%>%
+  filter(BorrowerRate>quantile(BorrowerRate,0.01))%>%
+  filter(BorrowerRate<quantile(BorrowerRate,0.99))%>%
+  ggplot(aes(x=DebtToIncomeRatio,y=BorrowerRate))+
+    geom_jitter(alpha=0.05,color="#f65436")+
+    geom_smooth()
+    
 
 
-#levels(RawData$Occupation)
-levels(reorder(RawData$Occupation, -table(RawData$Occupation)[RawData$Occupation]))[0:10]
-#levels(t)
+  
 ```
-
 ```{r}
-BIT=table(RawData$Occupation)[RawData$Occupation]
+cor.test(RawData$DebtToIncomeRatio,RawData$BorrowerRate)
 ```
 
 
 ```{r}
 RawData%>%
-  ggplot(aes(x=reorder(Occupation, -table(Occupation)[Occupation])))+
-  geom_bar()+
-  coord_trans(y="sqrt")+
-  #ylim(500,100000)+
-  theme(axis.text.x = element_text(size=6, angle=90,hjust = 1))+
-  labs(title="Occupation ", x="Occupation", y="Count")
+  filter(is.finite(LoanOriginalAmount))%>%
+  filter(LoanOriginalAmount>quantile(LoanOriginalAmount,0.01))%>%
+  filter(LoanOriginalAmount<quantile(LoanOriginalAmount,0.99))%>%
+  filter(BorrowerRate>quantile(BorrowerRate,0.01))%>%
+  filter(BorrowerRate<quantile(BorrowerRate,0.99))%>%
+  ggplot(aes(x=LoanOriginalAmount,y=BorrowerRate))+
+    geom_point(alpha=0.05,color="#f65436")+
+    geom_smooth()
+
+```
+
+
+```{r}
+cor.test(RawData$LoanOriginalAmount,RawData$BorrowerRate)
 ```
 
 ```

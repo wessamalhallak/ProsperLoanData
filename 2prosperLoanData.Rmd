@@ -34,9 +34,6 @@ a margin line to help you keep track of this guideline!
 # for other code chunks once you have verified that each plot comes out as you
 # want it to. This will clean up the flow of your report.
 
-#install.packages("devtools")
-#install_github("clauswilke/ggridges")
-library(devtools)
 library(ggplot2)
 library(ggridges)
 library(plyr)
@@ -63,7 +60,7 @@ Term
 LoanStatus
 IncomeRange
 BorrowerRate
-ProsperRatig
+ProsperRating (numeric)
 Occupation
 EmploymentStatus
 EmploymentStatusDuration
@@ -75,39 +72,25 @@ Investors
 
 
 ```{r}
-RawData$ListingCreationDate<-
-  as.POSIXct(RawData$ListingCreationDate,format="%Y-%m-%d %H:%M:%S")
+RawData$ListingCreationDate<- as.POSIXct(RawData$ListingCreationDate,format="%Y-%m-%d %H:%M:%S")
 
 ggplot(data=RawData,aes(x=ListingCreationDate))+
-  geom_histogram(bins=200,fill="#567456")+
+  geom_histogram(bins=200)+
   theme(axis.text.x = element_text(size=10),
-          axis.text.y = element_text(size=10, angle=45))+
-  labs(title="Listing Creation Date  ",
-       subtitle="The date the listing was created.",
-       y="Count")
+          axis.text.y = element_text(size=10, angle=45))
 ```
 
 ```{r}
-Occupation_group<- 
-  group_by(RawData,Occupation)
+Occupation_group<- group_by(RawData,Occupation)
 
-RawData.Occupation_group<-
-  summarise(Occupation_group,count=n())
+RawData.Occupation_group<-summarise(Occupation_group,count=n())
 
-RawData.Occupation_group<-
-  arrange(RawData.Occupation_group,-(count))
+RawData.Occupation_group<-arrange(RawData.Occupation_group,-(count))
 
 
-
-ggplot(data = head(RawData.Occupation_group,10),
-       aes(x= reorder(Occupation, -count), 
-           y=count))+
+ggplot(data = head(RawData.Occupation_group,10),aes(x= reorder(Occupation, -count)   , y=count))+
   geom_bar(stat = "identity")+
-  theme(axis.text.x = element_text(size=10, angle=45,hjust = 1))+
-  labs(title="Occupation ",
-       subtitle="The Occupation selected by the Borrower at the time they created the listing.",
-       x="Occupation",
-       y="Count")
+  theme(axis.text.x = element_text(size=10, angle=45,hjust = 1))
 
 ```
 
@@ -119,31 +102,29 @@ ggplot(data = head(RawData.Occupation_group,10),
 
 ##aes(x=reorder(Position, -table(Position)[Position]))
 
-#ggplot(data=RawData,aes(x=reorder(Occupation, -table(Occupation)[Occupation])))+
-#  geom_bar()+
-#  coord_trans(y="sqrt")+
+ggplot(data=RawData,aes(x=reorder(Occupation, -table(Occupation)[Occupation])))+
+  geom_bar()+
+  coord_trans(y="sqrt")+
   #ylim(500,100000)+
-  #theme(axis.text.x = element_text(size=6, angle=90,hjust = 1))+
-  #labs(title="Occupation ",
-       #subtitle="The Occupation selected by the Borrower at the time they created the listing.",
-       #x="Occupation",
-       #y="Count")
-
-
-
-#RawData %>%
-#  count(Occupation) %>%
-#  filter(n > quantile(n,0.85)) %>%
-#  ggplot(aes(x = reorder(Occupation,-n), y = n)) +
-#    geom_bar(stat = "identity") + theme_minimal() +
-#    theme(axis.text.x = element_text(size = 10, angle= 45, hjust=1))+
-#    labs(title="Occupation ", x="Occupation", y="Count")
-
+  theme(axis.text.x = element_text(size=6, angle=90,hjust = 1))+
+  labs(title="Occupation ",
+       subtitle="",
+       x="Occupation",
+       y="Count")
   
 
 ```
 
 
+```{r}
+RawData %>%
+  count(Occupation) %>%
+  filter(n > quantile(n,0.85)) %>%
+  ggplot(aes(x = reorder(Occupation,-n), y = n)) +
+    geom_bar(stat = "identity") + theme_minimal() +
+    theme(axis.text.x = element_text(size = 10, angle= 45, hjust=1))+
+    labs(title="Occupation ", x="Occupation", y="Count")
+```
 
 ```{r}
 RawData %>% count(Occupation) %>% 
@@ -216,30 +197,7 @@ RawData %>%
     #scale_fill_viridis(option = "A")+
     theme_minimal()+
     theme(axis.text.x = element_text(size = , angle= 45, hjust=1))+
-    labs(title="Income Range",
-         subtitle = "The income range of the borrower at the time the listing was created.",
-         x="Income Range",
-         y="Count",
-         fill="Sqrt(Count)")
-```
-
-EmploymentStatusDuration
-The length in months of the employment status at the time the listing was created.
-
-```{r}
-RawData%>%
-  filter(is.finite(EmploymentStatusDuration))%>%
-  ggplot(aes(x=EmploymentStatusDuration))+
-  geom_histogram(binwidth = 10,fill="#563ec3")+
-   theme_minimal()+
-    theme(axis.text.x = element_text(size = , angle= 45, hjust=1))+
-    labs(title="Income Range",
-         subtitle = "The length in months of the employment status at the time the listing was created.",
-         x="Inocme Range",
-         y="Count",
-         fill="Sqrt(Count)")
-```
-
+    labs(title="Income Range", x="Inocme Range", y="Count",fill="Sqrt(Count)")
 ```
 
 
@@ -266,7 +224,7 @@ LoanOriginalAmount
 ```{r}
 RawData%>%
   filter(LoanOriginalAmount!=0)%>%
-  ggplot(aes(x = LoanOriginalAmount))+
+  ggplot(aes(x = LoanOriginalAmount,fill=..x..))+
   geom_density()
   
 
@@ -609,19 +567,32 @@ RawData%>%
 
 
 Term vs Investors
-
-
 ```{r}
+
 RawData%>%
-  
-  ggplot(aes(x=LoanOriginalAmount, y=as.factor(Term), fill=0.5 - abs(0.5-..ecdf..))) +
-    stat_density_ridges(geom = "density_ridges_gradient", calc_ecdf = TRUE) +
-    scale_fill_viridis(name = "Tail probability", direction = -1)+
+  #filter(Investors>quantile(Investors,0.03))%>%
+  #filter(Investors<600)%>%
+  filter(Investors<quantile(Investors,0.97))%>%
+  ggplot(aes(x=Investors,y=as.factor(Term),fill=Term))+
+    geom_density_ridges2()+
+    theme_minimal()+
+    coord_trans(y="sqrt")+
+    scale_fill_viridis(option = "D")+
     theme(axis.text.x = element_text(size = , angle= 45, hjust=1))+
     labs(title="Investors",
          subtitle="The number of investors that funded the loan.",
          x="Investors",
-         y="Term")
+         y="Count")
+
+
+
+```
+
+```{r}
+RawData%>%
+  ggplot(aes(x=LoanOriginalAmount, y=as.factor(Term), fill=0.5 - abs(0.5-..ecdf..))) +
+    stat_density_ridges(geom = "density_ridges_gradient", calc_ecdf = TRUE) +
+    scale_fill_viridis(name = "Tail probability", direction = -1)
 ```
 
 
